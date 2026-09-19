@@ -1,0 +1,499 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#0d3b66">
+  <title>UROMED App</title>
+  <style>
+:root{
+  color-scheme:light;
+  --navy:#0d3b66;--blue:#155d9c;--red:#b3262d;--bg:#f3f6f9;--panel:#fff;
+  --text:#172033;--muted:#6d7888;--line:#dde5ec;--green:#247a53;--yellow:#b17912;
+  font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text)}
+button,input,select{font:inherit}
+button{cursor:pointer}
+.app-shell{max-width:1180px;margin:auto;padding:18px}
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px}
+.brand{display:flex;align-items:center;gap:11px}.brand strong{font-size:1.08rem}.brand small{display:block;color:var(--muted);margin-top:2px}
+.brandmark{width:46px;height:46px;border-radius:14px;background:var(--navy);color:#fff;display:grid;place-items:center;font-weight:900;font-size:20px;box-shadow:inset 0 -5px 0 var(--red)}
+.demo-pill{font-size:11px;background:#fff0d2;color:#7a520a;border:1px solid #f0d28f;border-radius:999px;padding:7px 10px;font-weight:800}
+.tabs{display:flex;gap:8px;overflow:auto;padding:4px 0 12px;scrollbar-width:none}.tabs::-webkit-scrollbar{display:none}
+.tab{border:1px solid var(--line);background:#fff;color:var(--text);border-radius:12px;padding:10px 13px;font-size:13px;font-weight:800;white-space:nowrap;min-height:44px}
+.tab.active{background:var(--navy);color:#fff;border-color:var(--navy)}
+.view{display:none}.view.active{display:block}
+.hero{background:linear-gradient(135deg,var(--navy),#174f80);color:#fff;padding:22px;border-radius:22px;margin-bottom:12px}.hero h1{font-size:2rem;margin:4px 0 6px}.hero p{margin:0;max-width:700px;color:#e8f1f8}
+.eyebrow{font-size:10px;font-weight:900;letter-spacing:.12em;color:#7a8795}.hero .eyebrow{color:#cce0f0}
+.kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin:12px 0}.kpis.compact{margin-top:0}
+.kpi{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:14px;min-width:0}.kpi span,.kpi small{display:block}.kpi span{font-size:12px;color:var(--muted);font-weight:700}.kpi strong{display:block;font-size:28px;margin:5px 0}.kpi small{font-size:11px;color:var(--muted)}.negative{color:var(--red)}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:16px;margin:12px 0}.panel h2{font-size:15px;margin:0 0 12px}.panel.warning{border-left:4px solid var(--yellow);background:#fffaf0}.panel.warning p{margin:5px 0 0;color:#695522}
+.quick-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.primary,.secondary,.danger,.ghost{border:0;border-radius:12px;min-height:44px;padding:10px 13px;font-weight:800}
+.primary{background:var(--navy);color:white}.danger{background:var(--red);color:white}.secondary{background:#e8f0f8;color:var(--navy)}.ghost{background:#f1f4f7;color:var(--text)}
+.section-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:5px 0 12px}.section-head h1{margin:2px 0 0;font-size:1.65rem}
+.filters{display:flex;gap:8px;flex-wrap:wrap}.filters select,.search{min-height:44px;border:1px solid var(--line);background:#fff;border-radius:12px;padding:10px 12px;color:var(--text);font-size:16px}.search{width:100%;margin-bottom:10px}
+.calendar-note{display:flex;gap:10px;align-items:flex-start;padding:12px;border-radius:13px;background:#eff6fb;margin-bottom:10px}.calendar-note p{margin:3px 0 0;font-size:12px;color:var(--muted)}
+.list{display:grid;gap:8px}.list-item{display:flex;align-items:center;gap:10px;border:1px solid #e7edf2;background:#fafcfd;padding:11px;border-radius:13px;min-width:0}.list-item>div{flex:1;min-width:0}.list-item strong,.list-item small{display:block}.list-item strong{font-size:13px}.list-item small{font-size:11px;color:var(--muted);margin-top:3px}
+.status{font-size:9px;font-weight:900;padding:5px 7px;border-radius:999px;white-space:nowrap}.status.green{background:#dcf2e6;color:#17633f}.status.yellow{background:#fff0ca;color:#7b5409}.status.red{background:#fde2e3;color:#8b1d23}.status.blue{background:#dcecf9;color:#15527e}.status.gray{background:#edf0f3;color:#55606c}
+.item-actions{display:flex;gap:5px;flex-wrap:wrap;justify-content:flex-end}.mini{border:1px solid var(--line);background:#fff;border-radius:9px;padding:7px 8px;font-size:10px;font-weight:800;min-height:34px}.mini.active-arrived{background:#dcf2e6;color:#17633f}.mini.active-noshow{background:#fde2e3;color:#8b1d23}
+.upload{display:block;border:1px dashed #aebccc;background:#f8fafc;border-radius:14px;padding:15px;text-align:center;font-weight:800;color:var(--navy);cursor:pointer}.upload input{display:none}
+.preview-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-top:10px}.file-preview{border:1px solid var(--line);border-radius:12px;overflow:hidden;background:#fafcfd}.file-preview img{display:block;width:100%;aspect-ratio:1/1;object-fit:cover}.file-preview span{display:block;font-size:10px;padding:7px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.kanban{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}.lane{background:#eaf0f5;border-radius:16px;padding:10px;min-height:150px}.lane h3{font-size:12px;margin:0 0 8px}.surgery-card{background:#fff;border:1px solid var(--line);padding:11px;border-radius:12px;font-size:12px;font-weight:800}.surgery-card small{display:block;color:var(--muted);font-weight:500;margin-top:5px}
+.empty-state{text-align:center;padding:24px;color:var(--muted)}.empty-state strong{display:block;color:var(--text);margin-bottom:5px}
+dialog{width:min(660px,calc(100% - 24px));max-height:92vh;border:0;border-radius:20px;padding:0;box-shadow:0 20px 70px rgba(0,0,0,.24);overflow:auto}dialog::backdrop{background:rgba(5,15,25,.55)}dialog form{padding:18px}.dialog-head{display:flex;justify-content:space-between;align-items:flex-start}.dialog-head h2{margin:2px 0 12px}.icon-btn{border:0;background:#eef2f5;border-radius:50%;width:40px;height:40px;font-size:24px}
+.form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.field{display:grid;gap:5px}.field.full{grid-column:1/-1}.field label,.field>span{font-size:11px;font-weight:800;color:#667383}.field input,.field select,.field textarea{width:100%;min-height:44px;border:1px solid var(--line);border-radius:11px;padding:9px 10px;font-size:16px;font-family:inherit}.field textarea{min-height:82px;resize:vertical}
+.dialog-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:14px}.form-help{font-size:10px;color:var(--muted);margin-bottom:0}
+footer{display:flex;justify-content:space-between;gap:12px;color:var(--muted);font-size:10px;padding:16px 2px 4px}footer span{text-align:right}
+@media(max-width:800px){.kpis{grid-template-columns:repeat(2,minmax(0,1fr))}.quick-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.kanban{grid-template-columns:repeat(2,minmax(0,1fr))}.preview-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:520px){.app-shell{padding:12px}.demo-pill{display:none}.hero h1{font-size:1.6rem}.list-item{align-items:flex-start;flex-wrap:wrap}.item-actions{width:100%;justify-content:flex-start}.kanban{grid-template-columns:1fr}.form-grid{grid-template-columns:1fr}.field.full{grid-column:auto}.preview-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.section-head{align-items:flex-start}.section-head>button{flex:0 0 auto}.filters select{width:100%}footer{display:block}footer span{display:block;text-align:left;margin-top:4px}}
+.hidden{display:none!important}.muted{color:var(--muted)}
+.auth-panel{border-left:4px solid var(--navy)}.auth-head{margin:0 0 6px}.auth-head h2{margin:2px 0 0}
+.login-grid{display:grid;grid-template-columns:1fr 1fr auto;gap:8px;margin-top:12px}.login-grid input{min-height:44px;border:1px solid var(--line);border-radius:11px;padding:9px 10px;font-size:16px}
+.session-row{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:12px;padding:10px 12px;border-radius:12px;background:#f3f7fb}.session-row strong,.session-row small{display:block}.session-row small{color:var(--muted);margin-top:2px}
+.success-note{border-left:4px solid var(--green);background:#f4fbf7}.success-note p{margin:5px 0 0;color:#315c46}
+.locked{opacity:.55;pointer-events:none}.toast{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);background:#172033;color:#fff;padding:10px 14px;border-radius:999px;font-size:12px;font-weight:800;z-index:9999;box-shadow:0 10px 30px rgba(0,0,0,.2)}
+@media(max-width:650px){.login-grid{grid-template-columns:1fr}.auth-head{align-items:flex-start}.session-row{align-items:flex-start}}
+
+</style>
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <div class="brand">
+        <div class="brandmark">U</div>
+        <div>
+          <strong>UROMED</strong>
+          <small>Control clínico · conectado a Supabase</small>
+        </div>
+      </div>
+      <span class="demo-pill" id="connectionPill">SIN SESIÓN</span>
+    </header>
+
+    <section class="panel auth-panel" id="authPanel">
+      <div class="section-head auth-head">
+        <div><span class="eyebrow">ACCESO PROTEGIDO</span><h2>Entrar a UROMED</h2></div>
+        <span class="status blue" id="authStatus">BASE CONECTADA</span>
+      </div>
+      <p class="muted" id="authMessage">La app ya está conectada al proyecto UROMED ZAM-LP. Para ver los expedientes reales se requiere un usuario autorizado de Supabase.</p>
+      <form id="loginForm" class="login-grid">
+        <input id="loginEmail" type="email" autocomplete="username" placeholder="Correo" required>
+        <input id="loginPassword" type="password" autocomplete="current-password" placeholder="Contraseña" required>
+        <button class="primary" type="submit">Entrar</button>
+      </form>
+      <div class="session-row hidden" id="sessionRow">
+        <div><strong id="sessionName">Usuario</strong><small id="sessionRole"></small></div>
+        <button class="ghost" id="logoutBtn" type="button">Cerrar sesión</button>
+      </div>
+    </section>
+
+    <nav class="tabs" aria-label="Secciones">
+      <button class="tab active" data-view="inicio">Inicio</button>
+      <button class="tab" data-view="agenda">Agenda</button>
+      <button class="tab" data-view="pacientes">Pacientes</button>
+      <button class="tab" data-view="vacunas">Vacunas</button>
+      <button class="tab" data-view="zoladex">Zoladex</button>
+      <button class="tab" data-view="psa">PSA</button>
+      <button class="tab" data-view="cirugias">Cirugías</button>
+      <button class="tab" data-view="seguimiento">Seguimiento</button>
+      <button class="tab" data-view="inventario">Inventario</button>
+    </nav>
+
+    <main>
+      <section class="view active" id="inicio">
+        <div class="hero">
+          <div>
+            <span class="eyebrow">UROMED LA PIEDAD / ZAMORA</span>
+            <h1>Centro de control</h1>
+            <p>Agenda, expedientes, vacunas, Zoladex, PSA, cirugías, seguimiento e inventario en un solo lugar.</p>
+          </div>
+        </div>
+
+        <div class="kpis">
+          <article class="kpi"><span>Citas hoy</span><strong id="kpiCitas">—</strong><small>base real</small></article>
+          <article class="kpi"><span>Confirmadas</span><strong id="kpiConfirmadas">—</strong><small>base real</small></article>
+          <article class="kpi"><span>No llegaron</span><strong id="kpiNoShow">—</strong><small>requiere seguimiento</small></article>
+          <article class="kpi"><span>Cirugías pendientes</span><strong id="kpiSurgeries">—</strong><small>base real</small></article>
+        </div>
+
+        <div class="panel">
+          <h2>Acciones rápidas</h2>
+          <div class="quick-grid">
+            <button class="primary" data-jump="agenda">Agenda</button>
+            <button class="primary" data-jump="pacientes">Pacientes</button>
+            <button class="primary" data-jump="vacunas">Vacunas</button>
+            <button class="primary" data-jump="zoladex">Zoladex</button>
+            <button class="secondary" data-jump="psa">PSA</button>
+            <button class="danger" data-jump="cirugias">Cirugías</button>
+            <button class="secondary" data-jump="seguimiento">Seguimiento</button>
+          </div>
+        </div>
+
+        <div class="panel success-note" id="migrationSummary">
+          <strong>Migración VPH preparada</strong>
+          <p>15 pacientes · 25 aplicaciones · inventario Gardasil conciliado en 8 dosis.</p>
+        </div>
+      </section>
+
+      <section class="view" id="agenda">
+        <div class="section-head">
+          <div><span class="eyebrow">AGENDA CLÍNICA</span><h1>Agenda</h1></div>
+          <button class="primary requires-auth" id="newAppointmentBtn">＋ Cita</button>
+        </div>
+        <div class="filters">
+          <select id="branchFilter"><option value="all">Todas las sucursales</option><option>La Piedad</option><option>Zamora</option></select>
+          <select id="appointmentStatusFilter"><option value="all">Todos los estados</option><option>Agendada</option><option>Confirmada</option><option>Llegó</option><option>No llegó</option><option>Canceló</option><option>Reprogramada</option><option>Completada</option></select>
+        </div>
+        <div class="panel"><div id="appointmentList" class="list"><div class="empty-state">Inicia sesión para cargar la agenda.</div></div></div>
+      </section>
+
+      <section class="view" id="pacientes">
+        <div class="section-head"><div><span class="eyebrow">EXPEDIENTE</span><h1>Pacientes</h1></div><button class="primary requires-auth" id="newPatientBtn">＋ Paciente</button></div>
+        <input class="search" id="patientSearch" placeholder="Buscar por folio, nombre o teléfono">
+        <div class="panel"><div id="patientList" class="list"><div class="empty-state">Inicia sesión para cargar pacientes.</div></div></div>
+      </section>
+
+      <section class="view" id="vacunas">
+        <div class="section-head"><div><span class="eyebrow">GARDASIL 9</span><h1>Vacunas</h1></div><button class="primary requires-auth" data-open-form="vaccineForm">＋ Aplicación</button></div>
+        <div class="kpis compact">
+          <article class="kpi"><span>Pacientes VPH</span><strong id="vphPatients">—</strong><small>base real</small></article>
+          <article class="kpi"><span>Dosis aplicadas</span><strong id="vphApplications">—</strong><small>base real</small></article>
+          <article class="kpi"><span>Esquemas completos</span><strong id="vphComplete">—</strong><small>3 dosis</small></article>
+          <article class="kpi"><span>Inventario</span><strong id="gardasilStock">—</strong><small>dosis disponibles</small></article>
+        </div>
+        <div class="panel"><div id="vaccineList" class="list"><div class="empty-state">Inicia sesión para cargar aplicaciones.</div></div></div>
+      </section>
+
+      <section class="view" id="zoladex">
+        <div class="section-head"><div><span class="eyebrow">TRATAMIENTO</span><h1>Zoladex</h1></div><button class="primary requires-auth" data-open-form="zoladexForm">＋ Aplicación</button></div>
+        <div class="panel"><div id="zoladexList" class="list"><div class="empty-state">Aún no hay datos cargados o falta iniciar sesión.</div></div></div>
+      </section>
+
+
+      <section class="view" id="psa">
+        <div class="section-head"><div><span class="eyebrow">ANTÍGENO PROSTÁTICO</span><h1>Seguimiento PSA</h1></div><button class="primary requires-auth" data-open-form="psaForm">＋ Resultado</button></div>
+        <div class="kpis compact">
+          <article class="kpi"><span>Pacientes en control</span><strong id="psaPatients">—</strong><small>con al menos un resultado</small></article>
+          <article class="kpi"><span>Último PSA ≥ 4.0</span><strong id="psaReview">—</strong><small>requiere revisión médica</small></article>
+          <article class="kpi"><span>Tendencia ascendente</span><strong id="psaRising">—</strong><small>último mayor al previo</small></article>
+          <article class="kpi"><span>Umbral de alerta</span><strong>4.0</strong><small>ng/mL · no es diagnóstico</small></article>
+        </div>
+        <div class="panel warning"><strong>Alerta clínica</strong><p>La app marca en rojo un PSA total igual o mayor a 4.0 ng/mL para revisión. Un valor elevado por sí solo no diagnostica cáncer de próstata y debe interpretarse con el contexto clínico.</p></div>
+        <div class="filters"><select id="psaPatientFilter"><option value="all">Todos los pacientes</option></select></div>
+        <div class="panel"><div id="psaList" class="list"><div class="empty-state">Inicia sesión para cargar resultados de PSA.</div></div></div>
+      </section>
+
+      <section class="view" id="cirugias">
+        <div class="section-head"><div><span class="eyebrow">QUIRÓFANO</span><h1>Cirugías</h1></div><button class="danger requires-auth" data-open-form="surgeryForm">＋ Cirugía</button></div>
+        <div class="kanban" id="surgeryBoard"></div>
+      </section>
+
+      <section class="view" id="seguimiento">
+        <div class="section-head"><div><span class="eyebrow">RECUPERACIÓN</span><h1>Seguimiento</h1></div><button class="secondary requires-auth" data-open-form="followForm">＋ Seguimiento</button></div>
+        <div class="panel"><div id="followupList" class="list"><div class="empty-state">Inicia sesión para cargar seguimientos.</div></div></div>
+      </section>
+
+      <section class="view" id="inventario">
+        <div class="section-head"><div><span class="eyebrow">ALMACÉN</span><h1>Inventario</h1></div><button class="primary requires-auth" data-open-form="inventoryForm">＋ Entrada</button></div>
+        <div class="panel"><div id="inventoryList" class="list"><div class="empty-state">Inicia sesión para cargar inventario.</div></div></div>
+      </section>
+    </main>
+
+    <dialog id="recordDialog">
+      <form method="dialog" id="genericForm">
+        <div class="dialog-head"><div><span class="eyebrow" id="dialogEyebrow">REGISTRO</span><h2 id="dialogTitle">Nuevo registro</h2></div><button class="icon-btn" value="cancel">×</button></div>
+        <div id="dialogFields" class="form-grid"></div>
+        <div class="dialog-actions"><button class="ghost" value="cancel">Cancelar</button><button class="primary" value="default">Guardar</button></div>
+        <p class="form-help">Los datos se guardan en Supabase únicamente cuando existe una sesión autorizada.</p>
+      </form>
+    </dialog>
+
+    <footer><strong>UROMED App · v5</strong><span>Operación clínica activa · Supabase + RLS · Agenda, pacientes, vacunas, Zoladex, PSA, cirugías, seguimientos e inventario.</span></footer>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+(() => {
+  const SUPABASE_URL = 'https://agktxhcelvmdiozoumki.supabase.co';
+  const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_XFrpPqvxOtvO0LoppJqBzQ_xw7UcavZ';
+  const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
+  const $ = (s, root=document) => root.querySelector(s);
+  const $$ = (s, root=document) => [...root.querySelectorAll(s)];
+
+  const state = { session:null, profile:null, clinic:null, patients:[], appointments:[], applications:[], schemes:[], surgeries:[], followups:[], psaTests:[], inventoryItems:[], inventoryMovements:[] };
+  const patientMap = () => new Map(state.patients.map(p=>[p.id,p]));
+  const fmtDate = v => v ? new Date(v+'T12:00:00').toLocaleDateString('es-MX',{day:'2-digit',month:'short',year:'numeric'}) : '—';
+  const fmtTime = v => v ? new Date(v).toLocaleTimeString('es-MX',{hour:'2-digit',minute:'2-digit'}) : '—';
+  const todayKey = () => new Date().toISOString().slice(0,10);
+  const esc = s => String(s ?? '').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
+  const toast = msg => { const el=document.createElement('div'); el.className='toast'; el.textContent=msg; document.body.appendChild(el); setTimeout(()=>el.remove(),2600); };
+
+  function switchView(name){ $$('.view').forEach(v=>v.classList.toggle('active',v.id===name)); $$('.tab').forEach(t=>t.classList.toggle('active',t.dataset.view===name)); window.scrollTo({top:0,behavior:'smooth'}); }
+  $$('.tab').forEach(b=>b.addEventListener('click',()=>switchView(b.dataset.view)));
+  $$('[data-jump]').forEach(b=>b.addEventListener('click',()=>switchView(b.dataset.jump)));
+
+  function setAuthUI(){
+    const logged=!!state.session;
+    $('#loginForm').classList.toggle('hidden',logged);
+    $('#sessionRow').classList.toggle('hidden',!logged);
+    $('#connectionPill').textContent = state.profile ? 'CONECTADA' : logged ? 'ACCESO PENDIENTE' : 'SIN SESIÓN';
+    $('#connectionPill').style.background = state.profile ? '#dcf2e6' : '#fff0d2';
+    $('#connectionPill').style.color = state.profile ? '#17633f' : '#7a520a';
+    if(state.profile){
+      $('#sessionName').textContent=state.profile.display_name || state.session.user.email;
+      $('#sessionRole').textContent=`${state.profile.role} · ${state.clinic?.name || 'UROMED'}`;
+      $('#authMessage').textContent='Sesión protegida activa. La información visible proviene de Supabase.';
+      $('#authStatus').textContent='ACCESO AUTORIZADO';
+      $$('.requires-auth').forEach(x=>x.classList.remove('locked'));
+    }else if(logged){
+      $('#sessionName').textContent=state.session.user.email;
+      $('#sessionRole').textContent='Sin perfil de clínica asignado';
+      $('#authMessage').textContent='El usuario inició sesión, pero todavía no está asignado a UROMED ZAM-LP. Falta crear su perfil autorizado.';
+      $('#authStatus').textContent='FALTA PERFIL';
+      $$('.requires-auth').forEach(x=>x.classList.add('locked'));
+    }else{
+      $('#authMessage').textContent='La app ya está conectada al proyecto UROMED ZAM-LP. Para ver los expedientes reales se requiere un usuario autorizado de Supabase.';
+      $('#authStatus').textContent='BASE CONECTADA';
+      $$('.requires-auth').forEach(x=>x.classList.add('locked'));
+    }
+  }
+
+  async function signIn(email,password){
+    const {data,error}=await sb.auth.signInWithPassword({email,password});
+    if(error) throw error; state.session=data.session; await bootstrap();
+  }
+  $('#loginForm').addEventListener('submit',async e=>{e.preventDefault(); const btn=e.submitter; btn.disabled=true; try{await signIn($('#loginEmail').value.trim(),$('#loginPassword').value); toast('Sesión iniciada');}catch(err){toast(err.message || 'No fue posible iniciar sesión');}finally{btn.disabled=false;}});
+  $('#logoutBtn').addEventListener('click',async()=>{await sb.auth.signOut(); Object.assign(state,{session:null,profile:null,clinic:null,patients:[],appointments:[],applications:[],schemes:[],surgeries:[],followups:[],psaTests:[],inventoryItems:[],inventoryMovements:[]}); setAuthUI(); renderAll();});
+
+  async function bootstrap(){
+    const {data:{session}}=await sb.auth.getSession(); state.session=session;
+    if(!session){setAuthUI(); renderAll(); return;}
+    const {data:profile,error:pErr}=await sb.from('profiles').select('*').eq('user_id',session.user.id).maybeSingle();
+    if(pErr){console.error(pErr);}
+    state.profile=profile || null;
+    if(!state.profile){setAuthUI(); renderAll(); return;}
+    const {data:clinic}=await sb.from('clinics').select('*').eq('id',state.profile.clinic_id).maybeSingle(); state.clinic=clinic || null;
+    await loadData(); setAuthUI(); renderAll();
+  }
+
+  async function loadData(){
+    const cid=state.profile.clinic_id;
+    const results=await Promise.all([
+      sb.from('patients').select('*').eq('clinic_id',cid).order('full_name'),
+      sb.from('appointments').select('*').eq('clinic_id',cid).order('starts_at'),
+      sb.from('medication_applications').select('*').eq('clinic_id',cid).order('applied_at',{ascending:false}),
+      sb.from('vaccine_schemes').select('*').eq('clinic_id',cid),
+      sb.from('surgeries').select('*').eq('clinic_id',cid).order('created_at',{ascending:false}),
+      sb.from('followups').select('*').eq('clinic_id',cid).order('due_date',{ascending:true}),
+      sb.from('psa_tests').select('*').eq('clinic_id',cid).order('test_date',{ascending:false}),
+      sb.from('inventory_items').select('*').eq('clinic_id',cid),
+      sb.from('inventory_movements').select('*').eq('clinic_id',cid)
+    ]);
+    const names=['patients','appointments','applications','schemes','surgeries','followups','psaTests','inventoryItems','inventoryMovements'];
+    results.forEach((r,i)=>{ if(r.error) console.error(names[i],r.error); state[names[i]]=r.data||[]; });
+  }
+
+  const statusColor = s => ({'Agendada':'gray','Confirmada':'blue','Llegó':'green','No llegó':'red','Canceló':'gray','Reprogramada':'yellow','Completada':'green','Pendiente':'yellow','Programada':'blue','Realizada':'green','Seguimiento':'blue','Alta':'green','Urgente':'red','Alta':'red'}[s]||'gray');
+
+  function renderAppointments(){
+    const list=$('#appointmentList'); if(!state.profile){list.innerHTML='<div class="empty-state">Inicia sesión con un usuario autorizado para cargar la agenda.</div>';return;}
+    const branch=$('#branchFilter').value,status=$('#appointmentStatusFilter').value,pm=patientMap();
+    const items=state.appointments.filter(a=>(branch==='all'||a.branch===branch)&&(status==='all'||a.status===status)).sort((a,b)=>new Date(a.starts_at)-new Date(b.starts_at));
+    const calendarName=a=>{const p=pm.get(a.patient_id);if(p?.full_name)return p.full_name;const notes=String(a.notes||'');const m=notes.match(/\[GCAL\]\s*(?:[^|\n]*\|\s*)?([^|\n]+)/i);return (m?.[1]||'').trim()||'Sin paciente';};
+    list.innerHTML=items.length?'':'<div class="empty-state"><strong>Sin citas</strong><p>Cuando registremos o sincronicemos Google Calendar aparecerán aquí.</p></div>';
+    items.forEach(a=>{const row=document.createElement('div');row.className='list-item';row.innerHTML=`<span class="status ${statusColor(a.status)}">${esc(a.status).toUpperCase()}</span><div><strong>${fmtTime(a.starts_at)} · ${esc(calendarName(a))}</strong><small>${esc(a.branch)} · ${esc(a.appointment_type)} · ${new Date(a.starts_at).toLocaleDateString('es-MX')}</small></div><div class="item-actions"><button class="mini" data-s="Confirmada">Confirmar</button><button class="mini" data-s="Llegó">Llegó</button><button class="mini" data-s="No llegó">No llegó</button></div>`;
+      row.querySelectorAll('[data-s]').forEach(btn=>btn.addEventListener('click',async()=>{const {error}=await sb.from('appointments').update({status:btn.dataset.s,updated_at:new Date().toISOString()}).eq('id',a.id);if(error)return toast(error.message);a.status=btn.dataset.s;renderAppointments();updateKpis();}));list.appendChild(row);});
+  }
+
+  function renderPatients(){
+    const list=$('#patientList'); if(!state.profile){list.innerHTML='<div class="empty-state">Inicia sesión para cargar pacientes.</div>';return;}
+    const q=$('#patientSearch').value.trim().toLowerCase(); const items=state.patients.filter(p=>`${p.folio} ${p.full_name} ${p.phone||''}`.toLowerCase().includes(q));
+    list.innerHTML=items.length?'':'<div class="empty-state">No se encontraron pacientes.</div>';
+    items.forEach(p=>{const doses=state.applications.filter(a=>a.patient_id===p.id&&a.product==='Gardasil 9').length;const row=document.createElement('div');row.className='list-item';row.innerHTML=`<span class="status blue">${esc(p.folio)}</span><div><strong>${esc(p.full_name)}</strong><small>${esc(p.phone||'Sin teléfono')} · ${doses?`${doses} dosis Gardasil`:'Expediente activo'}</small></div>`;list.appendChild(row);});
+  }
+  $('#patientSearch').addEventListener('input',renderPatients);
+  $('#branchFilter').addEventListener('change',renderAppointments); $('#appointmentStatusFilter').addEventListener('change',renderAppointments);
+
+  function stockFor(product){const ids=new Set(state.inventoryItems.filter(i=>i.product===product).map(i=>i.id));return state.inventoryMovements.filter(m=>ids.has(m.item_id)).reduce((s,m)=>s+Number(m.quantity||0),0);}
+  function renderVaccines(){
+    const list=$('#vaccineList'); if(!state.profile){list.innerHTML='<div class="empty-state">Inicia sesión para cargar aplicaciones.</div>';return;}
+    const pm=patientMap(); const apps=state.applications.filter(a=>a.product==='Gardasil 9');
+    $('#vphPatients').textContent=new Set(state.schemes.filter(s=>s.product==='Gardasil 9').map(s=>s.patient_id)).size;
+    $('#vphApplications').textContent=apps.length; const by=new Map();apps.forEach(a=>{if(!by.has(a.patient_id))by.set(a.patient_id,new Set());if(a.dose_number)by.get(a.patient_id).add(a.dose_number);}); $('#vphComplete').textContent=[...by.values()].filter(s=>s.has(1)&&s.has(2)&&s.has(3)).length; $('#gardasilStock').textContent=stockFor('Gardasil 9');
+    list.innerHTML=apps.length?'':'<div class="empty-state">Sin aplicaciones registradas.</div>';
+    apps.forEach(a=>{const p=pm.get(a.patient_id);const row=document.createElement('div');row.className='list-item';row.innerHTML=`<span class="status green">DOSIS ${esc(a.dose_number||'—')}</span><div><strong>${esc(p?.full_name||'Paciente')}</strong><small>${fmtDate(a.applied_at)} · ${esc(a.lot?`Lote ${a.lot}`:'Sin lote capturado')}</small></div>`;list.appendChild(row);});
+  }
+
+  function renderZoladex(){const list=$('#zoladexList'); if(!state.profile){list.innerHTML='<div class="empty-state">Inicia sesión para cargar tratamientos.</div>';return;} const pm=patientMap(),apps=state.applications.filter(a=>a.product?.toLowerCase().includes('zoladex'));list.innerHTML=apps.length?'':'<div class="empty-state"><strong>Listo para comenzar</strong><p>Aún no hay aplicaciones Zoladex registradas.</p></div>';apps.forEach(a=>{const p=pm.get(a.patient_id),r=document.createElement('div');r.className='list-item';r.innerHTML=`<span class="status blue">${esc(a.presentation||'ZOLADEX')}</span><div><strong>${esc(p?.full_name||'Paciente')}</strong><small>${fmtDate(a.applied_at)} · próxima ${fmtDate(a.next_due_date)}</small></div>`;list.appendChild(r);});}
+
+  function renderSurgeries(){const board=$('#surgeryBoard'); const statuses=['Pendiente','Programada','Realizada','Seguimiento']; const pm=patientMap();board.innerHTML='';statuses.forEach(st=>{const lane=document.createElement('div');lane.className='lane';lane.innerHTML=`<h3>${st}</h3>`;const items=state.profile?state.surgeries.filter(s=>s.status===st):[];if(!items.length){const e=document.createElement('div');e.className='empty-state';e.textContent=state.profile?'Sin registros':'Inicia sesión';lane.appendChild(e);}items.forEach(s=>{const p=pm.get(s.patient_id),c=document.createElement('div');c.className='surgery-card';c.innerHTML=`${esc(p?.full_name||'Paciente')}<small>${esc(s.procedure_name)}${s.scheduled_at?' · '+new Date(s.scheduled_at).toLocaleDateString('es-MX'):''}</small>`;lane.appendChild(c);});board.appendChild(lane);});}
+
+  function renderFollowups(){const list=$('#followupList');if(!state.profile){list.innerHTML='<div class="empty-state">Inicia sesión para cargar seguimientos.</div>';return;}const pm=patientMap(),items=state.followups.filter(f=>f.status==='Pendiente');list.innerHTML=items.length?'':'<div class="empty-state"><strong>Sin seguimientos pendientes</strong></div>';items.forEach(f=>{const p=pm.get(f.patient_id),r=document.createElement('div');r.className='list-item';r.innerHTML=`<span class="status ${statusColor(f.priority)}">${esc(f.priority).toUpperCase()}</span><div><strong>${esc(p?.full_name||'Paciente')} · ${esc(f.followup_type)}</strong><small>${fmtDate(f.due_date)}</small></div><button class="ghost">Realizado</button>`;r.querySelector('button').addEventListener('click',async()=>{const {error}=await sb.from('followups').update({status:'Realizado',completed_at:new Date().toISOString()}).eq('id',f.id);if(error)return toast(error.message);f.status='Realizado';renderFollowups();});list.appendChild(r);});}
+
+
+  function renderPsa(){
+    const list=$('#psaList');
+    if(!state.profile){list.innerHTML='<div class="empty-state">Inicia sesión para cargar resultados de PSA.</div>';return;}
+    const pm=patientMap();
+    const filter=$('#psaPatientFilter');
+    const keep=filter.value;
+    const controlled=[...new Set(state.psaTests.map(t=>t.patient_id))];
+    filter.innerHTML='<option value="all">Todos los pacientes</option>'+controlled.map(id=>`<option value="${esc(id)}">${esc(pm.get(id)?.full_name||'Paciente')}</option>`).join('');
+    if([...filter.options].some(o=>o.value===keep)) filter.value=keep;
+
+    const histories=new Map();
+    controlled.forEach(id=>histories.set(id,state.psaTests.filter(t=>t.patient_id===id).sort((a,b)=>String(a.test_date).localeCompare(String(b.test_date)))));
+    const latest=[];
+    histories.forEach(arr=>{if(arr.length)latest.push(arr[arr.length-1]);});
+    $('#psaPatients').textContent=controlled.length;
+    $('#psaReview').textContent=latest.filter(t=>Number(t.psa_total)>=Number(t.reference_threshold||4)).length;
+    $('#psaRising').textContent=latest.filter(t=>{const h=histories.get(t.patient_id)||[];return h.length>1&&Number(h[h.length-1].psa_total)>Number(h[h.length-2].psa_total);}).length;
+
+    let items=[...state.psaTests].sort((a,b)=>String(b.test_date).localeCompare(String(a.test_date)));
+    if(filter.value!=='all') items=items.filter(t=>t.patient_id===filter.value);
+    list.innerHTML=items.length?'':'<div class="empty-state"><strong>Sin resultados PSA</strong><p>Registra el primer resultado con “＋ Resultado”.</p></div>';
+    items.forEach(t=>{
+      const p=pm.get(t.patient_id),total=Number(t.psa_total),threshold=Number(t.reference_threshold||4);
+      const h=histories.get(t.patient_id)||[],idx=h.findIndex(x=>x.id===t.id),prev=idx>0?h[idx-1]:null;
+      const delta=prev?total-Number(prev.psa_total):null;
+      const trend=delta===null?'Sin resultado previo':delta>0?`↑ +${delta.toFixed(2)} vs previo`:delta<0?`↓ ${delta.toFixed(2)} vs previo`:'Sin cambio vs previo';
+      const free=t.psa_free!=null?` · PSA libre ${Number(t.psa_free).toFixed(2)} ng/mL`:'';
+      const badge=total>=threshold?'<span class="status red">REVISAR ≥4</span>':'<span class="status green">&lt; 4 ng/mL</span>';
+      const r=document.createElement('div');r.className='list-item';
+      r.innerHTML=`${badge}<div><strong>${esc(p?.full_name||'Paciente')} · PSA ${total.toFixed(2)} ng/mL</strong><small>${fmtDate(t.test_date)}${free} · ${esc(trend)}${t.laboratory?` · ${esc(t.laboratory)}`:''}</small></div>`;
+      list.appendChild(r);
+    });
+  }
+  $('#psaPatientFilter').addEventListener('change',renderPsa);
+
+  function renderInventory(){const list=$('#inventoryList');if(!state.profile){list.innerHTML='<div class="empty-state">Inicia sesión para cargar inventario.</div>';return;}list.innerHTML='';state.inventoryItems.filter(i=>i.active).forEach(i=>{const stock=state.inventoryMovements.filter(m=>m.item_id===i.id).reduce((s,m)=>s+Number(m.quantity||0),0),r=document.createElement('div');r.className='list-item';r.innerHTML=`<span class="status ${stock<=2?'red':stock<=5?'yellow':'green'}">${stock}</span><div><strong>${esc(i.product)}</strong><small>${esc(i.presentation||'')} · existencia calculada</small></div>`;list.appendChild(r);});if(!state.inventoryItems.length)list.innerHTML='<div class="empty-state">Sin productos registrados.</div>';}
+
+  function updateKpis(){if(!state.profile){['kpiCitas','kpiConfirmadas','kpiNoShow','kpiSurgeries'].forEach(id=>$('#'+id).textContent='—');return;}const today=todayKey(),todayApps=state.appointments.filter(a=>String(a.starts_at).slice(0,10)===today);$('#kpiCitas').textContent=todayApps.length;$('#kpiConfirmadas').textContent=todayApps.filter(a=>a.status==='Confirmada').length;$('#kpiNoShow').textContent=todayApps.filter(a=>a.status==='No llegó').length;$('#kpiSurgeries').textContent=state.surgeries.filter(s=>['Pendiente','Programada'].includes(s.status)).length;}
+  function renderAll(){updateKpis();renderAppointments();renderPatients();renderVaccines();renderZoladex();renderPsa();renderSurgeries();renderFollowups();renderInventory();}
+
+  const dialog=$('#recordDialog'), fields=$('#dialogFields'), title=$('#dialogTitle'), eyebrow=$('#dialogEyebrow'); let currentKind=null;
+  const definitions={
+    patient:{title:'Nuevo paciente',eyebrow:'EXPEDIENTE',fields:[['full_name','Nombre completo','text'],['phone','Teléfono','tel'],['birth_date','Fecha de nacimiento','date'],['sex','Sexo','select',['Sin capturar','Masculino','Femenino','Otro']],['allergies','Alergias','text'],['clinical_alerts','Alertas clínicas','textarea'],['notes','Notas','textarea']]},
+    appointment:{title:'Nueva cita',eyebrow:'AGENDA',fields:[['patient_id','Paciente','patient'],['branch','Sucursal','select',['La Piedad','Zamora']],['date','Fecha','date'],['time','Hora','time'],['appointment_type','Tipo','select',['Consulta','Revisión','Vacuna','Zoladex','Posoperatorio','Otro']],['notes','Notas','textarea']]},
+    surgery:{title:'Nueva cirugía',eyebrow:'QUIRÓFANO',fields:[['patient_id','Paciente','patient'],['procedure_name','Procedimiento','text'],['scheduled_at','Fecha','date'],['branch','Sucursal','select',['La Piedad','Zamora']],['hospital','Hospital','text'],['status','Estado','select',['Pendiente','Programada','Realizada','Seguimiento','Alta']],['preop_pending','Pendientes preoperatorios','textarea'],['materials','Materiales','textarea'],['price','Precio','number'],['deposit','Anticipo','number'],['notes','Notas','textarea']]},
+    follow:{title:'Nuevo seguimiento',eyebrow:'SEGUIMIENTO',fields:[['patient_id','Paciente','patient'],['followup_type','Tipo','select',['Revisión posoperatoria','Patología','Estudios','Retiro de JJ','Aplicación','Llamada','Otro']],['due_date','Fecha','date'],['priority','Prioridad','select',['Normal','Alta','Urgente']],['notes','Notas','textarea']]},
+    psa:{title:'Registrar PSA',eyebrow:'ANTÍGENO PROSTÁTICO',fields:[['patient_id','Paciente','patient'],['test_date','Fecha del estudio','date'],['psa_total','PSA total (ng/mL)','number'],['psa_free','PSA libre (ng/mL) · opcional','number'],['laboratory','Laboratorio · opcional','text'],['notes','Observaciones','textarea']]},
+    inventory:{title:'Entrada de inventario',eyebrow:'INVENTARIO',fields:[['item_id','Producto','item'],['quantity','Cantidad','number'],['lot','Lote','text'],['expires_on','Caducidad','date']]},
+    vaccine:{title:'Registrar vacuna',eyebrow:'GARDASIL 9',fields:[['patient_id','Paciente','patient'],['applied_at','Fecha de aplicación','date'],['dose_number','Dosis','select',['1','2','3']],['lot','Lote','text'],['expires_on','Caducidad','date'],['notes','Observaciones','textarea']]},
+    zoladex:{title:'Registrar Zoladex',eyebrow:'TRATAMIENTO',fields:[['patient_id','Paciente','patient'],['presentation','Presentación','select',['3.6 mg','10.8 mg']],['applied_at','Fecha de aplicación','date'],['next_due_date','Próxima aplicación','date'],['lot','Lote','text'],['expires_on','Caducidad','date'],['amount_paid','Importe pagado','number'],['notes','Observaciones','textarea']]}
+  };
+  function makeSelect(options){const s=document.createElement('select');options.forEach(([v,t])=>{const o=document.createElement('option');o.value=v;o.textContent=t;s.appendChild(o);});return s;}
+  function openForm(kind){
+    if(!state.profile){toast('Primero necesitas un usuario autorizado');return;}
+    currentKind=kind;const d=definitions[kind];title.textContent=d.title;eyebrow.textContent=d.eyebrow;fields.innerHTML='';
+    d.fields.forEach((f,i)=>{
+      const [key,label,type,opts]=f,w=document.createElement('label');w.className='field';const sp=document.createElement('span');sp.textContent=label;w.appendChild(sp);let input;
+      if(type==='select') input=makeSelect(opts.map(x=>[x,x]));
+      else if(type==='patient') input=makeSelect(state.patients.map(p=>{
+        const doses=state.applications.filter(a=>a.patient_id===p.id&&a.product==='Gardasil 9').length;
+        return [p.id,`${p.folio} · ${p.full_name}${kind==='vaccine'?` · ${doses} dosis`:''}`];
+      }));
+      else if(type==='item') {
+        const opts=state.inventoryItems.filter(x=>x.active).map(x=>[x.id,`${x.product} ${x.presentation||''}`]);
+        const has=(product,presentation)=>state.inventoryItems.some(x=>x.active&&x.product===product&&(x.presentation||'')===presentation);
+        if(!has('Zoladex','3.6 mg')) opts.push(['__create__|Zoladex|3.6 mg','Zoladex 3.6 mg']);
+        if(!has('Zoladex','10.8 mg')) opts.push(['__create__|Zoladex|10.8 mg','Zoladex 10.8 mg']);
+        input=makeSelect(opts);
+      }
+      else if(type==='textarea') input=document.createElement('textarea');
+      else {input=document.createElement('input');input.type=type;if(type==='number'){input.step='any';if(key==='quantity'){input.min='1';input.step='1';}}}
+      input.name=key;if(i<2||(kind==='psa'&&key==='psa_total'))input.required=true;if(kind==='psa'&&['psa_total','psa_free'].includes(key)){input.min='0';input.step='0.001';}w.appendChild(input);fields.appendChild(w);
+    });
+    if(kind==='appointment'){
+      const d=fields.querySelector('[name="date"]'); if(d) d.value=todayKey();
+    }
+    if(kind==='vaccine'){
+      const dateInput=fields.querySelector('[name="applied_at"]'); if(dateInput) dateInput.value=todayKey();
+      const patientInput=fields.querySelector('[name="patient_id"]');
+      const doseInput=fields.querySelector('[name="dose_number"]');
+      const setSuggestedDose=()=>{
+        if(!patientInput||!doseInput) return;
+        const used=new Set(state.applications.filter(a=>a.patient_id===patientInput.value&&a.product==='Gardasil 9').map(a=>Number(a.dose_number)).filter(Boolean));
+        const next=[1,2,3].find(n=>!used.has(n));
+        if(next) doseInput.value=String(next);
+      };
+      patientInput?.addEventListener('change',setSuggestedDose); setSuggestedDose();
+    }
+    if(kind==='zoladex'){
+      const d=fields.querySelector('[name="applied_at"]'); if(d) d.value=todayKey();
+    }
+    if(kind==='psa'){
+      const d=fields.querySelector('[name="test_date"]'); if(d) d.value=todayKey();
+    }
+    dialog.showModal();
+  }
+  $('#newPatientBtn').addEventListener('click',()=>openForm('patient'));$('#newAppointmentBtn').addEventListener('click',()=>openForm('appointment'));$$('[data-open-form]').forEach(b=>b.addEventListener('click',()=>openForm(({vaccineForm:'vaccine',zoladexForm:'zoladex',psaForm:'psa',surgeryForm:'surgery',followForm:'follow',inventoryForm:'inventory'})[b.dataset.openForm])));
+
+  $('#genericForm').addEventListener('submit',async e=>{if(e.submitter?.value==='cancel')return;e.preventDefault();if(!state.profile)return toast('Sin acceso autorizado');const fd=Object.fromEntries(new FormData(e.currentTarget));const cid=state.profile.clinic_id,uid=state.session.user.id;try{
+      if(currentKind==='patient'){const folio='URO-'+Date.now().toString().slice(-6);const {error}=await sb.from('patients').insert({clinic_id:cid,folio,full_name:fd.full_name,phone:fd.phone||null,birth_date:fd.birth_date||null,sex:fd.sex||null,allergies:fd.allergies||null,clinical_alerts:fd.clinical_alerts||null,notes:fd.notes||null,created_by:uid});if(error)throw error;}
+      else if(currentKind==='appointment'){const starts=new Date(`${fd.date}T${fd.time}:00`).toISOString();const {error}=await sb.from('appointments').insert({clinic_id:cid,patient_id:fd.patient_id||null,branch:fd.branch,starts_at:starts,appointment_type:fd.appointment_type,status:'Agendada',notes:fd.notes||null,created_by:uid});if(error)throw error;}
+      else if(currentKind==='surgery'){const {error}=await sb.from('surgeries').insert({clinic_id:cid,patient_id:fd.patient_id,procedure_name:fd.procedure_name,scheduled_at:fd.scheduled_at?new Date(fd.scheduled_at+'T12:00:00').toISOString():null,branch:fd.branch||null,hospital:fd.hospital||null,status:fd.status,preop_pending:fd.preop_pending||null,materials:fd.materials||null,price:fd.price?Number(fd.price):null,deposit:fd.deposit?Number(fd.deposit):null,notes:fd.notes||null,created_by:uid});if(error)throw error;}
+      else if(currentKind==='follow'){const {error}=await sb.from('followups').insert({clinic_id:cid,patient_id:fd.patient_id,followup_type:fd.followup_type,due_date:fd.due_date||null,priority:fd.priority,status:'Pendiente',notes:fd.notes||null,created_by:uid});if(error)throw error;}
+      else if(currentKind==='psa'){const total=Number(fd.psa_total),free=fd.psa_free?Number(fd.psa_free):null;if(!Number.isFinite(total)||total<0)throw new Error('Captura un PSA total válido.');if(free!==null&&(!Number.isFinite(free)||free<0))throw new Error('Captura un PSA libre válido.');const {error}=await sb.from('psa_tests').insert({clinic_id:cid,patient_id:fd.patient_id,test_date:fd.test_date,psa_total:total,psa_free:free,reference_threshold:4.0,laboratory:fd.laboratory||null,notes:fd.notes||null,created_by:uid});if(error)throw error;}
+      else if(currentKind==='inventory'){
+        let itemId=fd.item_id;
+        if(itemId?.startsWith('__create__|')){
+          const [,product,presentation]=itemId.split('|');
+          const {data:item,error:iErr}=await sb.from('inventory_items').insert({clinic_id:cid,product,presentation,active:true}).select('*').single();
+          if(iErr){
+            const {data:existing,error:eErr}=await sb.from('inventory_items').select('*').eq('clinic_id',cid).eq('product',product).eq('presentation',presentation).maybeSingle();
+            if(eErr||!existing) throw iErr; itemId=existing.id;
+          } else itemId=item.id;
+        }
+        const qty=Number(fd.quantity); if(!Number.isInteger(qty)||qty<=0) throw new Error('La cantidad debe ser un número entero mayor a 0.');
+        const {error}=await sb.from('inventory_movements').insert({clinic_id:cid,item_id:itemId,movement_type:'Entrada',quantity:qty,movement_date:todayKey(),lot:fd.lot||null,expires_on:fd.expires_on||null,created_by:uid});if(error)throw error;
+      }
+      else if(currentKind==='vaccine'){
+        const dose=Number(fd.dose_number);
+        const existing=state.applications.find(a=>a.patient_id===fd.patient_id&&a.product==='Gardasil 9'&&Number(a.dose_number)===dose);
+        if(existing) throw new Error(`Este paciente ya tiene registrada la dosis ${dose} de Gardasil 9.`);
+        const item=state.inventoryItems.find(i=>i.active&&i.product==='Gardasil 9');
+        if(!item) throw new Error('No existe Gardasil 9 activo en inventario.');
+        const stock=stockFor('Gardasil 9');
+        if(stock<=0) throw new Error('No hay dosis disponibles de Gardasil 9 en inventario.');
+
+        let scheme=state.schemes.find(s=>s.patient_id===fd.patient_id&&s.product==='Gardasil 9');
+        if(!scheme){
+          const {data:newScheme,error:sErr}=await sb.from('vaccine_schemes').insert({clinic_id:cid,patient_id:fd.patient_id,product:'Gardasil 9',notes:'Creado desde UROMED App'}).select('*').single();
+          if(sErr) throw sErr; scheme=newScheme;
+        }
+
+        const appPayload={clinic_id:cid,patient_id:fd.patient_id,scheme_id:scheme?.id||null,product:'Gardasil 9',presentation:'1 dosis',dose_number:dose,applied_at:fd.applied_at,lot:fd.lot||null,expires_on:fd.expires_on||null,notes:fd.notes||'Registrado desde UROMED App',created_by:uid};
+        const {data:app,error:aErr}=await sb.from('medication_applications').insert(appPayload).select('*').single();
+        if(aErr) throw aErr;
+
+        const movePayload={clinic_id:cid,item_id:item.id,movement_type:'Aplicación',quantity:-1,movement_date:fd.applied_at,lot:fd.lot||null,expires_on:fd.expires_on||null,patient_id:fd.patient_id,application_id:app.id,notes:`Salida por dosis ${dose} Gardasil 9 · UROMED App`,created_by:uid};
+        const {error:mErr}=await sb.from('inventory_movements').insert(movePayload);
+        if(mErr){
+          await sb.from('medication_applications').delete().eq('id',app.id);
+          throw new Error('No se pudo descontar inventario; la aplicación fue revertida. '+mErr.message);
+        }
+      }
+      else if(currentKind==='zoladex'){
+        const item=state.inventoryItems.find(i=>i.active&&i.product==='Zoladex'&&(i.presentation||'')===fd.presentation);
+        if(!item) throw new Error(`Primero registra una entrada de inventario para Zoladex ${fd.presentation}.`);
+        const stock=state.inventoryMovements.filter(m=>m.item_id===item.id).reduce((s,m)=>s+Number(m.quantity||0),0);
+        if(stock<=0) throw new Error(`No hay existencias de Zoladex ${fd.presentation}. Registra una entrada de inventario primero.`);
+        const appPayload={clinic_id:cid,patient_id:fd.patient_id,product:'Zoladex',presentation:fd.presentation,applied_at:fd.applied_at,next_due_date:fd.next_due_date||null,lot:fd.lot||null,expires_on:fd.expires_on||null,amount_paid:fd.amount_paid?Number(fd.amount_paid):null,notes:fd.notes||'Registrado desde UROMED App',created_by:uid};
+        const {data:app,error:aErr}=await sb.from('medication_applications').insert(appPayload).select('*').single();if(aErr)throw aErr;
+        const {error:mErr}=await sb.from('inventory_movements').insert({clinic_id:cid,item_id:item.id,movement_type:'Aplicación',quantity:-1,movement_date:fd.applied_at,lot:fd.lot||null,expires_on:fd.expires_on||null,patient_id:fd.patient_id,application_id:app.id,notes:`Salida Zoladex ${fd.presentation} · UROMED App`,created_by:uid});
+        if(mErr){await sb.from('medication_applications').delete().eq('id',app.id);throw new Error('No se pudo descontar inventario; la aplicación de Zoladex fue revertida. '+mErr.message);}
+      }
+      dialog.close();await loadData();renderAll();toast(currentKind==='vaccine'?'Vacuna guardada e inventario actualizado':currentKind==='zoladex'?'Zoladex guardado e inventario actualizado':'Registro guardado');
+    }catch(err){console.error(err);toast(err.message||'No se pudo guardar');}
+  });
+
+  sb.auth.onAuthStateChange((_event,session)=>{state.session=session;});
+    bootstrap();
+})();
+
+</script>
+</body>
+</html>
