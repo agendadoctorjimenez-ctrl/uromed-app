@@ -140,7 +140,7 @@ footer{display:flex;justify-content:space-between;gap:12px;color:var(--muted);fo
       <section class="view" id="agenda">
         <div class="section-head">
           <div><span class="eyebrow">AGENDA CLÍNICA</span><h1>Agenda</h1></div>
-          <button class="primary requires-auth" id="newAppointmentBtn">＋ Cita</button>
+          <div class="item-actions"><button class="secondary requires-auth" id="agendaNewPatientBtn">＋ Paciente</button><button class="primary requires-auth" id="newAppointmentBtn">＋ Cita</button></div>
         </div>
         <div class="filters">
           <select id="branchFilter"><option value="all">Todas las sucursales</option><option>La Piedad</option><option>Zamora</option></select>
@@ -210,7 +210,7 @@ footer{display:flex;justify-content:space-between;gap:12px;color:var(--muted);fo
       </form>
     </dialog>
 
-    <footer><strong>UROMED App · v5</strong><span>Operación clínica activa · Supabase + RLS · Agenda, pacientes, vacunas, Zoladex, PSA, cirugías, seguimientos e inventario.</span></footer>
+    <footer><strong>UROMED App · v5.1</strong><span>Operación clínica activa · Supabase + RLS · Agenda, pacientes, vacunas, Zoladex, PSA, cirugías, seguimientos e inventario.</span></footer>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -303,8 +303,12 @@ footer{display:flex;justify-content:space-between;gap:12px;color:var(--muted);fo
     const items=state.appointments.filter(a=>(branch==='all'||a.branch===branch)&&(status==='all'||a.status===status)).sort((a,b)=>new Date(a.starts_at)-new Date(b.starts_at));
     const calendarName=a=>{const p=pm.get(a.patient_id);if(p?.full_name)return p.full_name;const notes=String(a.notes||'');const m=notes.match(/\[GCAL\]\s*(?:[^|\n]*\|\s*)?([^|\n]+)/i);return (m?.[1]||'').trim()||'Sin paciente';};
     list.innerHTML=items.length?'':'<div class="empty-state"><strong>Sin citas</strong><p>Cuando registremos o sincronicemos Google Calendar aparecerán aquí.</p></div>';
-    items.forEach(a=>{const row=document.createElement('div');row.className='list-item';row.innerHTML=`<span class="status ${statusColor(a.status)}">${esc(a.status).toUpperCase()}</span><div><strong>${fmtTime(a.starts_at)} · ${esc(calendarName(a))}</strong><small>${esc(a.branch)} · ${esc(a.appointment_type)} · ${new Date(a.starts_at).toLocaleDateString('es-MX')}</small></div><div class="item-actions"><button class="mini" data-s="Confirmada">Confirmar</button><button class="mini" data-s="Llegó">Llegó</button><button class="mini" data-s="No llegó">No llegó</button></div>`;
-      row.querySelectorAll('[data-s]').forEach(btn=>btn.addEventListener('click',async()=>{const {error}=await sb.from('appointments').update({status:btn.dataset.s,updated_at:new Date().toISOString()}).eq('id',a.id);if(error)return toast(error.message);a.status=btn.dataset.s;renderAppointments();updateKpis();}));list.appendChild(row);});
+    items.forEach(a=>{const row=document.createElement('div');row.className='list-item';const linked=!!a.patient_id;const patientActions=linked?`<button class="mini" data-follow>＋ Pendiente</button>`:`<button class="mini" data-link>Vincular</button><button class="mini" data-new-patient>＋ Paciente</button>`;row.innerHTML=`<span class="status ${statusColor(a.status)}">${esc(a.status).toUpperCase()}</span><div><strong>${fmtTime(a.starts_at)} · ${esc(calendarName(a))}</strong><small>${esc(a.branch)} · ${esc(a.appointment_type)} · ${new Date(a.starts_at).toLocaleDateString('es-MX')}${linked?' · expediente vinculado':' · sin expediente vinculado'}</small></div><div class="item-actions">${patientActions}<button class="mini" data-s="Confirmada">Confirmar</button><button class="mini" data-s="Llegó">Llegó</button><button class="mini" data-s="No llegó">No llegó</button></div>`;
+      row.querySelectorAll('[data-s]').forEach(btn=>btn.addEventListener('click',async()=>{const {error}=await sb.from('appointments').update({status:btn.dataset.s,updated_at:new Date().toISOString()}).eq('id',a.id);if(error)return toast(error.message);a.status=btn.dataset.s;renderAppointments();updateKpis();}));
+      row.querySelector('[data-follow]')?.addEventListener('click',()=>openForm('follow',{patient_id:a.patient_id,due_date:todayKey(),priority:'Normal',notes:`Pendiente posterior a consulta del ${new Date(a.starts_at).toLocaleDateString('es-MX')}.`}));
+      row.querySelector('[data-link]')?.addEventListener('click',()=>{linkAppointmentId=a.id;openForm('linkPatient');});
+      row.querySelector('[data-new-patient]')?.addEventListener('click',()=>{linkAppointmentId=a.id;const name=calendarName(a);openForm('patient',{full_name:name==='Sin paciente'?'':name});});
+      list.appendChild(row);});
   }
 
   function renderPatients(){
@@ -373,10 +377,11 @@ footer{display:flex;justify-content:space-between;gap:12px;color:var(--muted);fo
   function updateKpis(){if(!state.profile){['kpiCitas','kpiConfirmadas','kpiNoShow','kpiSurgeries'].forEach(id=>$('#'+id).textContent='—');return;}const today=todayKey(),todayApps=state.appointments.filter(a=>String(a.starts_at).slice(0,10)===today);$('#kpiCitas').textContent=todayApps.length;$('#kpiConfirmadas').textContent=todayApps.filter(a=>a.status==='Confirmada').length;$('#kpiNoShow').textContent=todayApps.filter(a=>a.status==='No llegó').length;$('#kpiSurgeries').textContent=state.surgeries.filter(s=>['Pendiente','Programada'].includes(s.status)).length;}
   function renderAll(){updateKpis();renderAppointments();renderPatients();renderVaccines();renderZoladex();renderPsa();renderSurgeries();renderFollowups();renderInventory();}
 
-  const dialog=$('#recordDialog'), fields=$('#dialogFields'), title=$('#dialogTitle'), eyebrow=$('#dialogEyebrow'); let currentKind=null;
+  const dialog=$('#recordDialog'), fields=$('#dialogFields'), title=$('#dialogTitle'), eyebrow=$('#dialogEyebrow'); let currentKind=null, linkAppointmentId=null;
   const definitions={
     patient:{title:'Nuevo paciente',eyebrow:'EXPEDIENTE',fields:[['full_name','Nombre completo','text'],['phone','Teléfono','tel'],['birth_date','Fecha de nacimiento','date'],['sex','Sexo','select',['Sin capturar','Masculino','Femenino','Otro']],['allergies','Alergias','text'],['clinical_alerts','Alertas clínicas','textarea'],['notes','Notas','textarea']]},
     appointment:{title:'Nueva cita',eyebrow:'AGENDA',fields:[['patient_id','Paciente','patient'],['branch','Sucursal','select',['La Piedad','Zamora']],['date','Fecha','date'],['time','Hora','time'],['appointment_type','Tipo','select',['Consulta','Revisión','Vacuna','Zoladex','Posoperatorio','Otro']],['notes','Notas','textarea']]},
+    linkPatient:{title:'Vincular paciente a cita',eyebrow:'AGENDA',fields:[['patient_id','Paciente','patient']]},
     surgery:{title:'Nueva cirugía',eyebrow:'QUIRÓFANO',fields:[['patient_id','Paciente','patient'],['procedure_name','Procedimiento','text'],['scheduled_at','Fecha','date'],['branch','Sucursal','select',['La Piedad','Zamora']],['hospital','Hospital','text'],['status','Estado','select',['Pendiente','Programada','Realizada','Seguimiento','Alta']],['preop_pending','Pendientes preoperatorios','textarea'],['materials','Materiales','textarea'],['price','Precio','number'],['deposit','Anticipo','number'],['notes','Notas','textarea']]},
     follow:{title:'Nuevo seguimiento',eyebrow:'SEGUIMIENTO',fields:[['patient_id','Paciente','patient'],['followup_type','Tipo','select',['Revisión posoperatoria','Patología','Estudios','Retiro de JJ','Aplicación','Llamada','Otro']],['due_date','Fecha','date'],['priority','Prioridad','select',['Normal','Alta','Urgente']],['notes','Notas','textarea']]},
     psa:{title:'Registrar PSA',eyebrow:'ANTÍGENO PROSTÁTICO',fields:[['patient_id','Paciente','patient'],['test_date','Fecha del estudio','date'],['psa_total','PSA total (ng/mL)','number'],['psa_free','PSA libre (ng/mL) · opcional','number'],['laboratory','Laboratorio · opcional','text'],['notes','Observaciones','textarea']]},
@@ -385,7 +390,7 @@ footer{display:flex;justify-content:space-between;gap:12px;color:var(--muted);fo
     zoladex:{title:'Registrar Zoladex',eyebrow:'TRATAMIENTO',fields:[['patient_id','Paciente','patient'],['presentation','Presentación','select',['3.6 mg','10.8 mg']],['applied_at','Fecha de aplicación','date'],['next_due_date','Próxima aplicación','date'],['lot','Lote','text'],['expires_on','Caducidad','date'],['amount_paid','Importe pagado','number'],['notes','Observaciones','textarea']]}
   };
   function makeSelect(options){const s=document.createElement('select');options.forEach(([v,t])=>{const o=document.createElement('option');o.value=v;o.textContent=t;s.appendChild(o);});return s;}
-  function openForm(kind){
+  function openForm(kind,defaults={}){
     if(!state.profile){toast('Primero necesitas un usuario autorizado');return;}
     currentKind=kind;const d=definitions[kind];title.textContent=d.title;eyebrow.textContent=d.eyebrow;fields.innerHTML='';
     d.fields.forEach((f,i)=>{
@@ -406,8 +411,13 @@ footer{display:flex;justify-content:space-between;gap:12px;color:var(--muted);fo
       else {input=document.createElement('input');input.type=type;if(type==='number'){input.step='any';if(key==='quantity'){input.min='1';input.step='1';}}}
       input.name=key;if(i<2||(kind==='psa'&&key==='psa_total'))input.required=true;if(kind==='psa'&&['psa_total','psa_free'].includes(key)){input.min='0';input.step='0.001';}w.appendChild(input);fields.appendChild(w);
     });
+    Object.entries(defaults||{}).forEach(([key,value])=>{const input=fields.querySelector(`[name="${key}"]`);if(input&&value!==undefined&&value!==null)input.value=String(value);});
     if(kind==='appointment'){
-      const d=fields.querySelector('[name="date"]'); if(d) d.value=todayKey();
+      const d=fields.querySelector('[name="date"]'); if(d&&!d.value) d.value=todayKey();
+    }
+    if(kind==='follow'){
+      const due=fields.querySelector('[name="due_date"]'); if(due&&!due.value) due.value=todayKey();
+      const priority=fields.querySelector('[name="priority"]'); if(priority&&!priority.value) priority.value='Normal';
     }
     if(kind==='vaccine'){
       const dateInput=fields.querySelector('[name="applied_at"]'); if(dateInput) dateInput.value=todayKey();
@@ -429,10 +439,11 @@ footer{display:flex;justify-content:space-between;gap:12px;color:var(--muted);fo
     }
     dialog.showModal();
   }
-  $('#newPatientBtn').addEventListener('click',()=>openForm('patient'));$('#newAppointmentBtn').addEventListener('click',()=>openForm('appointment'));$$('[data-open-form]').forEach(b=>b.addEventListener('click',()=>openForm(({vaccineForm:'vaccine',zoladexForm:'zoladex',psaForm:'psa',surgeryForm:'surgery',followForm:'follow',inventoryForm:'inventory'})[b.dataset.openForm])));
+  $('#newPatientBtn').addEventListener('click',()=>{linkAppointmentId=null;openForm('patient');});$('#agendaNewPatientBtn').addEventListener('click',()=>{linkAppointmentId=null;openForm('patient');});$('#newAppointmentBtn').addEventListener('click',()=>openForm('appointment'));$$('[data-open-form]').forEach(b=>b.addEventListener('click',()=>openForm(({vaccineForm:'vaccine',zoladexForm:'zoladex',psaForm:'psa',surgeryForm:'surgery',followForm:'follow',inventoryForm:'inventory'})[b.dataset.openForm])));
 
   $('#genericForm').addEventListener('submit',async e=>{if(e.submitter?.value==='cancel')return;e.preventDefault();if(!state.profile)return toast('Sin acceso autorizado');const fd=Object.fromEntries(new FormData(e.currentTarget));const cid=state.profile.clinic_id,uid=state.session.user.id;try{
-      if(currentKind==='patient'){const folio='URO-'+Date.now().toString().slice(-6);const {error}=await sb.from('patients').insert({clinic_id:cid,folio,full_name:fd.full_name,phone:fd.phone||null,birth_date:fd.birth_date||null,sex:fd.sex||null,allergies:fd.allergies||null,clinical_alerts:fd.clinical_alerts||null,notes:fd.notes||null,created_by:uid});if(error)throw error;}
+      if(currentKind==='patient'){const folio='URO-'+Date.now().toString().slice(-6);const {data:newPatient,error}=await sb.from('patients').insert({clinic_id:cid,folio,full_name:fd.full_name,phone:fd.phone||null,birth_date:fd.birth_date||null,sex:fd.sex||null,allergies:fd.allergies||null,clinical_alerts:fd.clinical_alerts||null,notes:fd.notes||null,created_by:uid}).select('*').single();if(error)throw error;if(linkAppointmentId&&newPatient){const {error:linkErr}=await sb.from('appointments').update({patient_id:newPatient.id,updated_at:new Date().toISOString()}).eq('id',linkAppointmentId);if(linkErr)throw linkErr;linkAppointmentId=null;}}
+      else if(currentKind==='linkPatient'){if(!linkAppointmentId)throw new Error('No se encontró la cita a vincular.');const {error}=await sb.from('appointments').update({patient_id:fd.patient_id,updated_at:new Date().toISOString()}).eq('id',linkAppointmentId);if(error)throw error;linkAppointmentId=null;}
       else if(currentKind==='appointment'){const starts=new Date(`${fd.date}T${fd.time}:00`).toISOString();const {error}=await sb.from('appointments').insert({clinic_id:cid,patient_id:fd.patient_id||null,branch:fd.branch,starts_at:starts,appointment_type:fd.appointment_type,status:'Agendada',notes:fd.notes||null,created_by:uid});if(error)throw error;}
       else if(currentKind==='surgery'){const {error}=await sb.from('surgeries').insert({clinic_id:cid,patient_id:fd.patient_id,procedure_name:fd.procedure_name,scheduled_at:fd.scheduled_at?new Date(fd.scheduled_at+'T12:00:00').toISOString():null,branch:fd.branch||null,hospital:fd.hospital||null,status:fd.status,preop_pending:fd.preop_pending||null,materials:fd.materials||null,price:fd.price?Number(fd.price):null,deposit:fd.deposit?Number(fd.deposit):null,notes:fd.notes||null,created_by:uid});if(error)throw error;}
       else if(currentKind==='follow'){const {error}=await sb.from('followups').insert({clinic_id:cid,patient_id:fd.patient_id,followup_type:fd.followup_type,due_date:fd.due_date||null,priority:fd.priority,status:'Pendiente',notes:fd.notes||null,created_by:uid});if(error)throw error;}
