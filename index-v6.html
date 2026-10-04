@@ -239,7 +239,7 @@ footer{display:flex;justify-content:space-between;gap:12px;color:var(--muted);fo
       <form method="dialog" id="genericForm">
         <div class="dialog-head"><div><span class="eyebrow" id="dialogEyebrow">REGISTRO</span><h2 id="dialogTitle">Nuevo registro</h2></div><button class="icon-btn" value="cancel">×</button></div>
         <div id="dialogFields" class="form-grid"></div>
-        <div class="dialog-actions"><button class="ghost" value="cancel">Cancelar</button><button class="primary" value="default">Guardar</button></div>
+        <div class="dialog-actions"><button class="ghost" type="button" id="genericCancelBtn">Cancelar</button><button class="primary" value="default">Guardar</button></div>
         <p class="form-help">Los datos se guardan en Supabase únicamente cuando existe una sesión autorizada.</p>
       </form>
     </dialog>
@@ -260,7 +260,11 @@ footer{display:flex;justify-content:space-between;gap:12px;color:var(--muted);fo
   const patientMap = () => new Map(state.patients.map(p=>[p.id,p]));
   const fmtDate = v => v ? new Date(v+'T12:00:00').toLocaleDateString('es-MX',{day:'2-digit',month:'short',year:'numeric'}) : '—';
   const fmtTime = v => v ? new Date(v).toLocaleTimeString('es-MX',{hour:'2-digit',minute:'2-digit'}) : '—';
-  const todayKey = () => new Date().toISOString().slice(0,10);
+  const todayKey = () => {
+    const d=new Date();
+    const y=d.getFullYear(),m=String(d.getMonth()+1).padStart(2,'0'),day=String(d.getDate()).padStart(2,'0');
+    return `${y}-${m}-${day}`;
+  };
   const esc = s => String(s ?? '').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
   const toast = msg => { const el=document.createElement('div'); el.className='toast'; el.textContent=msg; document.body.appendChild(el); setTimeout(()=>el.remove(),2600); };
 
@@ -440,6 +444,8 @@ footer{display:flex;justify-content:space-between;gap:12px;color:var(--muted);fo
   function renderAll(){updateKpis();renderAppointments();renderPatients();renderVaccines();renderZoladex();renderPsa();renderSurgeries();renderFollowups();renderInventory();}
 
   const dialog=$('#recordDialog'), fields=$('#dialogFields'), title=$('#dialogTitle'), eyebrow=$('#dialogEyebrow'); let currentKind=null;
+  $('#genericCancelBtn').addEventListener('click',()=>dialog.close());
+  $('#genericCloseBtn').addEventListener('click',()=>dialog.close());
   const definitions={
     patient:{title:'Nuevo paciente',eyebrow:'EXPEDIENTE',fields:[['full_name','Nombre completo','text'],['phone','Teléfono','tel'],['birth_date','Fecha de nacimiento','date'],['sex','Sexo','select',['Sin capturar','Masculino','Femenino','Otro']],['allergies','Alergias','text'],['clinical_alerts','Alertas clínicas','textarea'],['notes','Notas','textarea']]},
     appointment:{title:'Nueva cita',eyebrow:'AGENDA',fields:[['patient_id','Paciente','patient'],['branch','Sucursal','select',['La Piedad','Zamora']],['date','Fecha','date'],['time','Hora','time'],['appointment_type','Tipo','select',['Consulta','Revisión','Vacuna','Zoladex','Posoperatorio','Otro']],['notes','Notas','textarea']]},
@@ -473,7 +479,12 @@ footer{display:flex;justify-content:space-between;gap:12px;color:var(--muted);fo
       }
       else if(type==='textarea') input=document.createElement('textarea');
       else {input=document.createElement('input');input.type=type;if(type==='number'){input.step='any';if(key==='quantity'){input.min='1';input.step='1';}}}
-      input.name=key;if(i<2||(kind==='psa'&&key==='psa_total'))input.required=true;if(kind==='psa'&&['psa_total','psa_free'].includes(key)){input.min='0';input.step='0.001';}w.appendChild(input);fields.appendChild(w);
+      input.name=key;
+      if(i<2||(kind==='psa'&&key==='psa_total'))input.required=true;
+      if(kind==='lab') input.required=(key==='study_date');
+      if(kind==='study') input.required=(key==='study_date'||key==='study_type');
+      if(kind==='clinicalNote') input.required=(key==='clinical_note');
+      if(kind==='psa'&&['psa_total','psa_free'].includes(key)){input.min='0';input.step='0.001';}w.appendChild(input);fields.appendChild(w);
     });
     if(kind==='appointment'){
       const d=fields.querySelector('[name="date"]'); if(d) d.value=todayKey();
@@ -513,6 +524,8 @@ footer{display:flex;justify-content:space-between;gap:12px;color:var(--muted);fo
       else if(currentKind==='follow'){const {error}=await sb.from('followups').insert({clinic_id:cid,patient_id:fd.patient_id,followup_type:fd.followup_type,due_date:fd.due_date||null,priority:fd.priority,status:'Pendiente',notes:fd.notes||null,created_by:uid});if(error)throw error;}
       else if(currentKind==='psa'){const total=Number(fd.psa_total),free=fd.psa_free?Number(fd.psa_free):null;if(!Number.isFinite(total)||total<0)throw new Error('Captura un PSA total válido.');if(free!==null&&(!Number.isFinite(free)||free<0))throw new Error('Captura un PSA libre válido.');const {error}=await sb.from('psa_tests').insert({clinic_id:cid,patient_id:fd.patient_id,test_date:fd.test_date,psa_total:total,psa_free:free,reference_threshold:4.0,laboratory:fd.laboratory||null,notes:fd.notes||null,created_by:uid});if(error)throw error;}
       else if(currentKind==='lab'){
+        const labFields=['hemoglobin','hematocrit','platelets','leukocytes','glucose','urea','creatinine','uric_acid','total_cholesterol','triglycerides','hdl','ldl','vldl','hba1c','testosterone','ego','urine_culture','spermatobioscopy','notes'];
+        if(!labFields.some(k=>String(fd[k]??'').trim()!=='')) throw new Error('Captura al menos un resultado u observación del laboratorio.');
         const numeric=['hemoglobin','hematocrit','platelets','leukocytes','glucose','urea','creatinine','uric_acid','total_cholesterol','triglycerides','hdl','ldl','vldl','hba1c','testosterone'];
         const payload={patient_id:activePatientId,study_date:fd.study_date||todayKey(),ego:fd.ego||null,urine_culture:fd.urine_culture||null,spermatobioscopy:fd.spermatobioscopy||null,notes:fd.notes||null,created_by:uid};
         numeric.forEach(k=>payload[k]=fd[k]!==''&&fd[k]!=null?Number(fd[k]):null);
