@@ -308,15 +308,14 @@ footer{display:flex;justify-content:space-between;gap:12px;color:var(--muted);fo
       return (!selectedDate||localDate===selectedDate)&&(branch==='all'||a.branch===branch)&&(status==='all'||a.status===status);
     }).sort((a,b)=>new Date(a.starts_at)-new Date(b.starts_at));
     const calendarName=a=>{
-      const p=pm.get(a.patient_id);
-      if(p?.full_name)return p.full_name;
-      let notes=String(a.notes||'').trim();
-      if(!notes)return 'Sin paciente';
-      const gcal=notes.match(/\[GCAL\]\s*(?:[^|\n]*\|\s*)?([^|\n]+)/i);
-      if(gcal?.[1])return gcal[1].trim();
-      notes=notes.replace(/^\[GCAL\]\s*/i,'').trim();
-      return (notes.split('|')[0]||'').trim()||'Sin paciente';
-    };
+  const p=pm.get(a.patient_id);
+  if(p?.full_name) return p.full_name;
+
+  const notes=String(a.notes||'').trim();
+  if(!notes) return 'Sin paciente';
+
+  return notes;
+};
     list.innerHTML=items.length?'':'<div class="empty-state"><strong>Sin citas</strong><p>Cuando registremos o sincronicemos Google Calendar aparecerán aquí.</p></div>';
     items.forEach(a=>{const row=document.createElement('div');row.className='list-item';row.innerHTML=`<span class="status ${statusColor(a.status)}">${esc(a.status).toUpperCase()}</span><div><strong>${fmtTime(a.starts_at)} · ${esc(calendarName(a))}</strong><small>${esc(a.branch)} · ${esc(a.appointment_type)} · ${new Date(a.starts_at).toLocaleDateString('es-MX')}</small></div><div class="item-actions"><button class="mini" data-s="Confirmada">Confirmar</button><button class="mini" data-s="Llegó">Llegó</button><button class="mini" data-s="No llegó">No llegó</button></div>`;
       row.querySelectorAll('[data-s]').forEach(btn=>btn.addEventListener('click',async()=>{const {error}=await sb.from('appointments').update({status:btn.dataset.s,updated_at:new Date().toISOString()}).eq('id',a.id);if(error)return toast(error.message);a.status=btn.dataset.s;renderAppointments();updateKpis();}));list.appendChild(row);});
