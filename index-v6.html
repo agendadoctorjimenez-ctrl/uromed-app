@@ -50,11 +50,6 @@ footer{display:flex;justify-content:space-between;gap:12px;color:var(--muted);fo
 @media(max-width:800px){.kpis{grid-template-columns:repeat(2,minmax(0,1fr))}.quick-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.kanban{grid-template-columns:repeat(2,minmax(0,1fr))}.preview-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
 @media(max-width:520px){.app-shell{padding:12px}.demo-pill{display:none}.hero h1{font-size:1.6rem}.list-item{align-items:flex-start;flex-wrap:wrap}.item-actions{width:100%;justify-content:flex-start}.kanban{grid-template-columns:1fr}.form-grid{grid-template-columns:1fr}.field.full{grid-column:auto}.preview-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.section-head{align-items:flex-start}.section-head>button{flex:0 0 auto}.filters select{width:100%}footer{display:block}footer span{display:block;text-align:left;margin-top:4px}}
 .hidden{display:none!important}.muted{color:var(--muted)}
-.patient-row{cursor:pointer}.patient-row:hover{border-color:#b9c9d7;background:#f5f9fc}
-.record-tabs{display:flex;gap:7px;overflow:auto;margin:2px 0 14px;padding-bottom:4px}.record-tab{border:1px solid var(--line);background:#fff;border-radius:10px;padding:9px 11px;font-size:11px;font-weight:900;white-space:nowrap}.record-tab.active{background:var(--navy);color:#fff;border-color:var(--navy)}
-.record-pane{display:none}.record-pane.active{display:block}.record-meta{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-bottom:12px}.record-meta div{border:1px solid var(--line);border-radius:12px;padding:10px;background:#fafcfd}.record-meta span{display:block;font-size:10px;color:var(--muted);font-weight:800}.record-meta strong{display:block;font-size:13px;margin-top:3px}
-.record-actions{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:10px}
-@media(max-width:520px){.record-meta{grid-template-columns:1fr}}
 .auth-panel{border-left:4px solid var(--navy)}.auth-head{margin:0 0 6px}.auth-head h2{margin:2px 0 0}
 .login-grid{display:grid;grid-template-columns:1fr 1fr auto;gap:8px;margin-top:12px}.login-grid input{min-height:44px;border:1px solid var(--line);border-radius:11px;padding:9px 10px;font-size:16px}
 .session-row{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:12px;padding:10px 12px;border-radius:12px;background:#f3f7fb}.session-row strong,.session-row small{display:block}.session-row small{color:var(--muted);margin-top:2px}
@@ -148,7 +143,7 @@ footer{display:flex;justify-content:space-between;gap:12px;color:var(--muted);fo
           <button class="primary requires-auth" id="newAppointmentBtn">＋ Cita</button>
         </div>
         <div class="filters">
-          <input id="agendaDate" type="date" aria-label="Fecha de agenda">
+          <input id="appointmentDateFilter" type="date" aria-label="Fecha de agenda">
           <select id="branchFilter"><option value="all">Todas las sucursales</option><option>La Piedad</option><option>Zamora</option></select>
           <select id="appointmentStatusFilter"><option value="all">Todos los estados</option><option>Agendada</option><option>Confirmada</option><option>Llegó</option><option>No llegó</option><option>Canceló</option><option>Reprogramada</option><option>Completada</option></select>
         </div>
@@ -207,45 +202,16 @@ footer{display:flex;justify-content:space-between;gap:12px;color:var(--muted);fo
       </section>
     </main>
 
-    <dialog id="patientRecordDialog">
-      <form method="dialog">
-        <div class="dialog-head">
-          <div><span class="eyebrow">EXPEDIENTE CLÍNICO</span><h2 id="recordPatientName">Paciente</h2><small id="recordPatientFolio" class="muted"></small></div>
-          <button class="icon-btn" value="cancel">×</button>
-        </div>
-        <div class="record-tabs">
-          <button type="button" class="record-tab active" data-record-pane="summary">Resumen</button>
-          <button type="button" class="record-tab" data-record-pane="labs">Laboratorios</button>
-          <button type="button" class="record-tab" data-record-pane="studies">Estudios e imágenes</button>
-          <button type="button" class="record-tab" data-record-pane="notes">Notas clínicas</button>
-        </div>
-        <section class="record-pane active" data-pane="summary"><div id="recordSummary"></div></section>
-        <section class="record-pane" data-pane="labs">
-          <div class="record-actions"><button type="button" class="primary" id="addLabBtn">＋ Laboratorio</button></div>
-          <div id="recordLabs" class="list"></div>
-        </section>
-        <section class="record-pane" data-pane="studies">
-          <div class="record-actions"><button type="button" class="primary" id="addStudyBtn">＋ Estudio</button></div>
-          <div id="recordStudies" class="list"></div>
-          <p class="form-help">El registro clínico ya admite la referencia del archivo. La carga privada de PDFs e imágenes se habilita al configurar Storage.</p>
-        </section>
-        <section class="record-pane" data-pane="notes">
-          <div class="record-actions"><button type="button" class="primary" id="addClinicalNoteBtn">＋ Nota clínica</button></div>
-          <div id="recordNotes" class="list"></div>
-        </section>
-      </form>
-    </dialog>
-
     <dialog id="recordDialog">
       <form method="dialog" id="genericForm">
-        <div class="dialog-head"><div><span class="eyebrow" id="dialogEyebrow">REGISTRO</span><h2 id="dialogTitle">Nuevo registro</h2></div><button class="icon-btn" type="button" id="genericCloseBtn">×</button></div>
+        <div class="dialog-head"><div><span class="eyebrow" id="dialogEyebrow">REGISTRO</span><h2 id="dialogTitle">Nuevo registro</h2></div><button class="icon-btn" value="cancel">×</button></div>
         <div id="dialogFields" class="form-grid"></div>
-        <div class="dialog-actions"><button class="ghost" type="button" id="genericCancelBtn">Cancelar</button><button class="primary" value="default">Guardar</button></div>
+        <div class="dialog-actions"><button class="ghost" value="cancel">Cancelar</button><button class="primary" value="default">Guardar</button></div>
         <p class="form-help">Los datos se guardan en Supabase únicamente cuando existe una sesión autorizada.</p>
       </form>
     </dialog>
 
-    <footer><strong>UROMED App · v6.3</strong><span>Operación clínica activa · Supabase + RLS · Agenda, expedientes clínicos, laboratorios, estudios, notas, vacunas, Zoladex, PSA, cirugías, seguimientos e inventario.</span></footer>
+    <footer><strong>UROMED App · v6.4</strong><span>Operación clínica activa · Supabase + RLS · Agenda, pacientes, vacunas, Zoladex, PSA, cirugías, seguimientos e inventario.</span></footer>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -257,15 +223,11 @@ footer{display:flex;justify-content:space-between;gap:12px;color:var(--muted);fo
   const $ = (s, root=document) => root.querySelector(s);
   const $$ = (s, root=document) => [...root.querySelectorAll(s)];
 
-  const state = { session:null, profile:null, clinic:null, patients:[], appointments:[], applications:[], schemes:[], surgeries:[], followups:[], psaTests:[], inventoryItems:[], inventoryMovements:[], patientLabs:[], patientStudies:[], patientClinicalNotes:[] };
+  const state = { session:null, profile:null, clinic:null, patients:[], appointments:[], applications:[], schemes:[], surgeries:[], followups:[], psaTests:[], inventoryItems:[], inventoryMovements:[] };
   const patientMap = () => new Map(state.patients.map(p=>[p.id,p]));
   const fmtDate = v => v ? new Date(v+'T12:00:00').toLocaleDateString('es-MX',{day:'2-digit',month:'short',year:'numeric'}) : '—';
   const fmtTime = v => v ? new Date(v).toLocaleTimeString('es-MX',{hour:'2-digit',minute:'2-digit'}) : '—';
-  const todayKey = () => {
-    const d=new Date();
-    const y=d.getFullYear(),m=String(d.getMonth()+1).padStart(2,'0'),day=String(d.getDate()).padStart(2,'0');
-    return `${y}-${m}-${day}`;
-  };
+  const todayKey = () => new Date().toISOString().slice(0,10);
   const esc = s => String(s ?? '').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
   const toast = msg => { const el=document.createElement('div'); el.className='toast'; el.textContent=msg; document.body.appendChild(el); setTimeout(()=>el.remove(),2600); };
 
@@ -304,7 +266,7 @@ footer{display:flex;justify-content:space-between;gap:12px;color:var(--muted);fo
     if(error) throw error; state.session=data.session; await bootstrap();
   }
   $('#loginForm').addEventListener('submit',async e=>{e.preventDefault(); const btn=e.submitter; btn.disabled=true; try{await signIn($('#loginEmail').value.trim(),$('#loginPassword').value); toast('Sesión iniciada');}catch(err){toast(err.message || 'No fue posible iniciar sesión');}finally{btn.disabled=false;}});
-  $('#logoutBtn').addEventListener('click',async()=>{await sb.auth.signOut(); Object.assign(state,{session:null,profile:null,clinic:null,patients:[],appointments:[],applications:[],schemes:[],surgeries:[],followups:[],psaTests:[],inventoryItems:[],inventoryMovements:[],patientLabs:[],patientStudies:[],patientClinicalNotes:[]}); setAuthUI(); renderAll();});
+  $('#logoutBtn').addEventListener('click',async()=>{await sb.auth.signOut(); Object.assign(state,{session:null,profile:null,clinic:null,patients:[],appointments:[],applications:[],schemes:[],surgeries:[],followups:[],psaTests:[],inventoryItems:[],inventoryMovements:[]}); setAuthUI(); renderAll();});
 
   async function bootstrap(){
     const {data:{session}}=await sb.auth.getSession(); state.session=session;
@@ -328,12 +290,9 @@ footer{display:flex;justify-content:space-between;gap:12px;color:var(--muted);fo
       sb.from('followups').select('*').eq('clinic_id',cid).order('due_date',{ascending:true}),
       sb.from('psa_tests').select('*').eq('clinic_id',cid).order('test_date',{ascending:false}),
       sb.from('inventory_items').select('*').eq('clinic_id',cid),
-      sb.from('inventory_movements').select('*').eq('clinic_id',cid),
-      sb.from('patient_labs').select('*').order('study_date',{ascending:false}),
-      sb.from('patient_studies').select('*').order('study_date',{ascending:false}),
-      sb.from('patient_clinical_notes').select('*').order('note_date',{ascending:false})
+      sb.from('inventory_movements').select('*').eq('clinic_id',cid)
     ]);
-    const names=['patients','appointments','applications','schemes','surgeries','followups','psaTests','inventoryItems','inventoryMovements','patientLabs','patientStudies','patientClinicalNotes'];
+    const names=['patients','appointments','applications','schemes','surgeries','followups','psaTests','inventoryItems','inventoryMovements'];
     results.forEach((r,i)=>{ if(r.error) console.error(names[i],r.error); state[names[i]]=r.data||[]; });
   }
 
@@ -341,51 +300,37 @@ footer{display:flex;justify-content:space-between;gap:12px;color:var(--muted);fo
 
   function renderAppointments(){
     const list=$('#appointmentList'); if(!state.profile){list.innerHTML='<div class="empty-state">Inicia sesión con un usuario autorizado para cargar la agenda.</div>';return;}
-    const branch=$('#branchFilter').value,status=$('#appointmentStatusFilter').value,pm=patientMap(),selected=$('#agendaDate')?.value||todayKey();
-    const localKey=v=>{const d=new Date(v);return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;};
-    const items=state.appointments.filter(a=>localKey(a.starts_at)===selected&&(branch==='all'||a.branch===branch)&&(status==='all'||a.status===status)).sort((a,b)=>new Date(a.starts_at)-new Date(b.starts_at));
-    const calendarName=a=>{const p=pm.get(a.patient_id);if(p?.full_name)return p.full_name;const notes=String(a.notes||'');const m=notes.match(/\[GCAL\]\s*(?:[^|\n]*\|\s*)?([^|\n]+)/i);return (m?.[1]||'').trim()||(a.patient_id?'Paciente no encontrado':'Sin paciente vinculado');};
-    list.innerHTML=items.length?'':`<div class="empty-state"><strong>Sin citas para ${new Date(selected+'T12:00:00').toLocaleDateString('es-MX')}</strong><p>Selecciona otra fecha o registra una nueva cita.</p></div>`;
-    items.forEach(a=>{const row=document.createElement('div');row.className='list-item';row.innerHTML=`<span class="status ${statusColor(a.status)}">${esc(a.status).toUpperCase()}</span><div><strong>${fmtTime(a.starts_at)} · ${esc(calendarName(a))}</strong><small>${esc(a.branch)} · ${esc(a.appointment_type)}</small></div><div class="item-actions"><button class="mini" data-s="Confirmada">Confirmar</button><button class="mini" data-s="Llegó">Llegó</button><button class="mini" data-s="No llegó">No llegó</button></div>`;
+    const branch=$('#branchFilter').value,status=$('#appointmentStatusFilter').value,pm=patientMap();
+    const selectedDate=$('#appointmentDateFilter')?.value||'';
+    const items=state.appointments.filter(a=>{
+      const d=new Date(a.starts_at);
+      const localDate=[d.getFullYear(),String(d.getMonth()+1).padStart(2,'0'),String(d.getDate()).padStart(2,'0')].join('-');
+      return (!selectedDate||localDate===selectedDate)&&(branch==='all'||a.branch===branch)&&(status==='all'||a.status===status);
+    }).sort((a,b)=>new Date(a.starts_at)-new Date(b.starts_at));
+    const calendarName=a=>{
+      const p=pm.get(a.patient_id);
+      if(p?.full_name)return p.full_name;
+      let notes=String(a.notes||'').trim();
+      if(!notes)return 'Sin paciente';
+      const gcal=notes.match(/\[GCAL\]\s*(?:[^|\n]*\|\s*)?([^|\n]+)/i);
+      if(gcal?.[1])return gcal[1].trim();
+      notes=notes.replace(/^\[GCAL\]\s*/i,'').trim();
+      return (notes.split('|')[0]||'').trim()||'Sin paciente';
+    };
+    list.innerHTML=items.length?'':'<div class="empty-state"><strong>Sin citas</strong><p>Cuando registremos o sincronicemos Google Calendar aparecerán aquí.</p></div>';
+    items.forEach(a=>{const row=document.createElement('div');row.className='list-item';row.innerHTML=`<span class="status ${statusColor(a.status)}">${esc(a.status).toUpperCase()}</span><div><strong>${fmtTime(a.starts_at)} · ${esc(calendarName(a))}</strong><small>${esc(a.branch)} · ${esc(a.appointment_type)} · ${new Date(a.starts_at).toLocaleDateString('es-MX')}</small></div><div class="item-actions"><button class="mini" data-s="Confirmada">Confirmar</button><button class="mini" data-s="Llegó">Llegó</button><button class="mini" data-s="No llegó">No llegó</button></div>`;
       row.querySelectorAll('[data-s]').forEach(btn=>btn.addEventListener('click',async()=>{const {error}=await sb.from('appointments').update({status:btn.dataset.s,updated_at:new Date().toISOString()}).eq('id',a.id);if(error)return toast(error.message);a.status=btn.dataset.s;renderAppointments();updateKpis();}));list.appendChild(row);});
   }
 
-  let activePatientId=null;
-  const patientRecordDialog=$('#patientRecordDialog');
   function renderPatients(){
     const list=$('#patientList'); if(!state.profile){list.innerHTML='<div class="empty-state">Inicia sesión para cargar pacientes.</div>';return;}
     const q=$('#patientSearch').value.trim().toLowerCase(); const items=state.patients.filter(p=>`${p.folio} ${p.full_name} ${p.phone||''}`.toLowerCase().includes(q));
     list.innerHTML=items.length?'':'<div class="empty-state">No se encontraron pacientes.</div>';
-    items.forEach(p=>{const doses=state.applications.filter(a=>a.patient_id===p.id&&a.product==='Gardasil 9').length;const row=document.createElement('div');row.className='list-item patient-row';row.innerHTML=`<span class="status blue">${esc(p.folio)}</span><div><strong>${esc(p.full_name)}</strong><small>${esc(p.phone||'Sin teléfono')} · ${doses?`${doses} dosis Gardasil`:'Expediente activo'} · Abrir expediente</small></div><button type="button" class="mini">Expediente</button>`;row.addEventListener('click',()=>openPatientRecord(p.id));list.appendChild(row);});
+    items.forEach(p=>{const doses=state.applications.filter(a=>a.patient_id===p.id&&a.product==='Gardasil 9').length;const row=document.createElement('div');row.className='list-item';row.innerHTML=`<span class="status blue">${esc(p.folio)}</span><div><strong>${esc(p.full_name)}</strong><small>${esc(p.phone||'Sin teléfono')} · ${doses?`${doses} dosis Gardasil`:'Expediente activo'}</small></div>`;list.appendChild(row);});
   }
-
-  function recordPatient(){return state.patients.find(p=>p.id===activePatientId);}
-  function openPatientRecord(id){
-    activePatientId=id; const p=recordPatient(); if(!p)return;
-    $('#recordPatientName').textContent=p.full_name;
-    $('#recordPatientFolio').textContent=p.folio||'';
-    renderPatientRecord();
-    $$('.record-tab').forEach((b,i)=>b.classList.toggle('active',i===0));
-    $$('.record-pane').forEach((x,i)=>x.classList.toggle('active',i===0));
-    patientRecordDialog.showModal();
-  }
-  $$('.record-tab').forEach(b=>b.addEventListener('click',()=>{$$('.record-tab').forEach(x=>x.classList.toggle('active',x===b));$$('.record-pane').forEach(x=>x.classList.toggle('active',x.dataset.pane===b.dataset.recordPane));}));
-  function renderPatientRecord(){
-    const p=recordPatient(); if(!p)return;
-    const psa=state.psaTests.filter(x=>x.patient_id===p.id).sort((a,b)=>String(b.test_date).localeCompare(String(a.test_date)))[0];
-    $('#recordSummary').innerHTML=`<div class="record-meta"><div><span>Folio</span><strong>${esc(p.folio||'—')}</strong></div><div><span>Teléfono</span><strong>${esc(p.phone||'—')}</strong></div><div><span>Nacimiento</span><strong>${fmtDate(p.birth_date)}</strong></div><div><span>Sexo</span><strong>${esc(p.sex||'—')}</strong></div><div><span>Alergias</span><strong>${esc(p.allergies||'Sin registro')}</strong></div><div><span>Último PSA</span><strong>${psa?Number(psa.psa_total).toFixed(2)+' ng/mL':'Sin resultado'}</strong></div></div>${p.clinical_alerts?`<div class="panel warning"><strong>Alertas clínicas</strong><p>${esc(p.clinical_alerts)}</p></div>`:''}${p.notes?`<div class="panel"><h2>Notas generales</h2><p>${esc(p.notes)}</p></div>`:''}`;
-    const labs=state.patientLabs.filter(x=>x.patient_id===p.id);
-    $('#recordLabs').innerHTML=labs.length?'':'<div class="empty-state"><strong>Sin laboratorios</strong><p>Registra el primer estudio.</p></div>';
-    labs.forEach(x=>{const vals=[['Hb',x.hemoglobin],['Hto',x.hematocrit],['Leu',x.leukocytes],['Plaquetas',x.platelets],['Glucosa',x.glucose],['Urea',x.urea],['Creatinina',x.creatinine],['Colesterol',x.total_cholesterol],['TG',x.triglycerides],['HDL',x.hdl],['LDL',x.ldl],['HbA1c',x.hba1c],['Testosterona',x.testosterone]].filter(v=>v[1]!=null).map(v=>`${v[0]} ${v[1]}`).join(' · ');const r=document.createElement('div');r.className='list-item';r.innerHTML=`<span class="status blue">LAB</span><div><strong>${fmtDate(x.study_date)}</strong><small>${esc(vals||x.notes||'Laboratorio registrado')}${x.ego?' · EGO capturado':''}${x.urine_culture?' · Urocultivo capturado':''}${x.spermatobioscopy?' · Espermatobioscopía capturada':''}</small></div>`;$('#recordLabs').appendChild(r);});
-    const studies=state.patientStudies.filter(x=>x.patient_id===p.id);
-    $('#recordStudies').innerHTML=studies.length?'':'<div class="empty-state"><strong>Sin estudios o imágenes</strong></div>';
-    studies.forEach(x=>{const r=document.createElement('div');r.className='list-item';r.innerHTML=`<span class="status blue">${esc(x.study_type)}</span><div><strong>${esc(x.title||x.study_type)} · ${fmtDate(x.study_date)}</strong><small>${esc(x.impression||x.findings||x.notes||'Sin descripción')}${x.file_name?` · Archivo: ${esc(x.file_name)}`:''}</small></div>`;$('#recordStudies').appendChild(r);});
-    const notes=state.patientClinicalNotes.filter(x=>x.patient_id===p.id);
-    $('#recordNotes').innerHTML=notes.length?'':'<div class="empty-state"><strong>Sin notas clínicas</strong></div>';
-    notes.forEach(x=>{const r=document.createElement('div');r.className='list-item';r.innerHTML=`<span class="status gray">NOTA</span><div><strong>${new Date(x.note_date).toLocaleDateString('es-MX')} · ${esc(x.reason||x.diagnosis||'Nota clínica')}</strong><small>${esc(x.clinical_note)}${x.follow_up?` · Seguimiento: ${esc(x.follow_up)}`:''}</small></div>`;$('#recordNotes').appendChild(r);});
-  }
-
   $('#patientSearch').addEventListener('input',renderPatients);
+  $('#appointmentDateFilter').value=todayKey();
+  $('#appointmentDateFilter').addEventListener('change',renderAppointments);
   $('#branchFilter').addEventListener('change',renderAppointments); $('#appointmentStatusFilter').addEventListener('change',renderAppointments);
 
   function stockFor(product){const ids=new Set(state.inventoryItems.filter(i=>i.product===product).map(i=>i.id));return state.inventoryMovements.filter(m=>ids.has(m.item_id)).reduce((s,m)=>s+Number(m.quantity||0),0);}
@@ -446,8 +391,6 @@ footer{display:flex;justify-content:space-between;gap:12px;color:var(--muted);fo
   function renderAll(){updateKpis();renderAppointments();renderPatients();renderVaccines();renderZoladex();renderPsa();renderSurgeries();renderFollowups();renderInventory();}
 
   const dialog=$('#recordDialog'), fields=$('#dialogFields'), title=$('#dialogTitle'), eyebrow=$('#dialogEyebrow'); let currentKind=null;
-  $('#genericCancelBtn')?.addEventListener('click',()=>dialog.close());
-  $('#genericCloseBtn')?.addEventListener('click',()=>dialog.close());
   const definitions={
     patient:{title:'Nuevo paciente',eyebrow:'EXPEDIENTE',fields:[['full_name','Nombre completo','text'],['phone','Teléfono','tel'],['birth_date','Fecha de nacimiento','date'],['sex','Sexo','select',['Sin capturar','Masculino','Femenino','Otro']],['allergies','Alergias','text'],['clinical_alerts','Alertas clínicas','textarea'],['notes','Notas','textarea']]},
     appointment:{title:'Nueva cita',eyebrow:'AGENDA',fields:[['patient_id','Paciente','patient'],['branch','Sucursal','select',['La Piedad','Zamora']],['date','Fecha','date'],['time','Hora','time'],['appointment_type','Tipo','select',['Consulta','Revisión','Vacuna','Zoladex','Posoperatorio','Otro']],['notes','Notas','textarea']]},
@@ -456,10 +399,7 @@ footer{display:flex;justify-content:space-between;gap:12px;color:var(--muted);fo
     psa:{title:'Registrar PSA',eyebrow:'ANTÍGENO PROSTÁTICO',fields:[['patient_id','Paciente','patient'],['test_date','Fecha del estudio','date'],['psa_total','PSA total (ng/mL)','number'],['psa_free','PSA libre (ng/mL) · opcional','number'],['laboratory','Laboratorio · opcional','text'],['notes','Observaciones','textarea']]},
     inventory:{title:'Entrada de inventario',eyebrow:'INVENTARIO',fields:[['item_id','Producto','item'],['quantity','Cantidad','number'],['lot','Lote','text'],['expires_on','Caducidad','date']]},
     vaccine:{title:'Registrar vacuna',eyebrow:'GARDASIL 9',fields:[['patient_id','Paciente','patient'],['applied_at','Fecha de aplicación','date'],['dose_number','Dosis','select',['1','2','3']],['lot','Lote','text'],['expires_on','Caducidad','date'],['notes','Observaciones','textarea']]},
-    zoladex:{title:'Registrar Zoladex',eyebrow:'TRATAMIENTO',fields:[['patient_id','Paciente','patient'],['presentation','Presentación','select',['3.6 mg','10.8 mg']],['applied_at','Fecha de aplicación','date'],['next_due_date','Próxima aplicación','date'],['lot','Lote','text'],['expires_on','Caducidad','date'],['amount_paid','Importe pagado','number'],['notes','Observaciones','textarea']]},
-    lab:{title:'Nuevo laboratorio',eyebrow:'EXPEDIENTE · LABORATORIOS',fields:[['study_date','Fecha','date'],['hemoglobin','Hemoglobina','number'],['hematocrit','Hematocrito','number'],['platelets','Plaquetas','number'],['leukocytes','Leucocitos','number'],['glucose','Glucosa','number'],['urea','Urea','number'],['creatinine','Creatinina','number'],['uric_acid','Ácido úrico','number'],['total_cholesterol','Colesterol total','number'],['triglycerides','Triglicéridos','number'],['hdl','HDL','number'],['ldl','LDL','number'],['vldl','VLDL','number'],['hba1c','Hemoglobina glucosilada (HbA1c)','number'],['testosterone','Testosterona','number'],['ego','EGO','textarea'],['urine_culture','Urocultivo','textarea'],['spermatobioscopy','Espermatobioscopía','textarea'],['notes','Observaciones','textarea']]},
-    study:{title:'Nuevo estudio / imagen',eyebrow:'EXPEDIENTE · ESTUDIOS',fields:[['study_date','Fecha','date'],['study_type','Tipo','select',['ULTRASONIDO','TOMOGRAFIA','RESONANCIA','RADIOGRAFIA','PATOLOGIA','BIOPSIA','OTRO']],['title','Título','text'],['findings','Hallazgos','textarea'],['impression','Impresión / conclusión','textarea'],['file_name','Nombre del archivo · opcional','text'],['notes','Observaciones','textarea']]},
-    clinicalNote:{title:'Nueva nota clínica',eyebrow:'EXPEDIENTE · NOTAS',fields:[['reason','Motivo','text'],['clinical_note','Nota clínica','textarea'],['diagnosis','Diagnóstico / impresión','textarea'],['pending','Pendientes','textarea'],['follow_up','Seguimiento','textarea']]}
+    zoladex:{title:'Registrar Zoladex',eyebrow:'TRATAMIENTO',fields:[['patient_id','Paciente','patient'],['presentation','Presentación','select',['3.6 mg','10.8 mg']],['applied_at','Fecha de aplicación','date'],['next_due_date','Próxima aplicación','date'],['lot','Lote','text'],['expires_on','Caducidad','date'],['amount_paid','Importe pagado','number'],['notes','Observaciones','textarea']]}
   };
   function makeSelect(options){const s=document.createElement('select');options.forEach(([v,t])=>{const o=document.createElement('option');o.value=v;o.textContent=t;s.appendChild(o);});return s;}
   function openForm(kind){
@@ -481,12 +421,7 @@ footer{display:flex;justify-content:space-between;gap:12px;color:var(--muted);fo
       }
       else if(type==='textarea') input=document.createElement('textarea');
       else {input=document.createElement('input');input.type=type;if(type==='number'){input.step='any';if(key==='quantity'){input.min='1';input.step='1';}}}
-      input.name=key;
-      if(i<2||(kind==='psa'&&key==='psa_total'))input.required=true;
-      if(kind==='lab') input.required=(key==='study_date');
-      if(kind==='study') input.required=(key==='study_date'||key==='study_type');
-      if(kind==='clinicalNote') input.required=(key==='clinical_note');
-      if(kind==='psa'&&['psa_total','psa_free'].includes(key)){input.min='0';input.step='0.001';}w.appendChild(input);fields.appendChild(w);
+      input.name=key;if(i<2||(kind==='psa'&&key==='psa_total'))input.required=true;if(kind==='psa'&&['psa_total','psa_free'].includes(key)){input.min='0';input.step='0.001';}w.appendChild(input);fields.appendChild(w);
     });
     if(kind==='appointment'){
       const d=fields.querySelector('[name="date"]'); if(d) d.value=todayKey();
@@ -509,15 +444,8 @@ footer{display:flex;justify-content:space-between;gap:12px;color:var(--muted);fo
     if(kind==='psa'){
       const d=fields.querySelector('[name="test_date"]'); if(d) d.value=todayKey();
     }
-    if(kind==='lab'||kind==='study'){
-      const d=fields.querySelector('[name="study_date"]'); if(d) d.value=todayKey();
-    }
     dialog.showModal();
   }
-  $('#addLabBtn').addEventListener('click',()=>openForm('lab'));
-  $('#addStudyBtn').addEventListener('click',()=>openForm('study'));
-  $('#addClinicalNoteBtn').addEventListener('click',()=>openForm('clinicalNote'));
-  const agendaDate=$('#agendaDate');if(agendaDate){agendaDate.value=todayKey();agendaDate.addEventListener('change',renderAppointments);}
   $('#newPatientBtn').addEventListener('click',()=>openForm('patient'));$('#newAppointmentBtn').addEventListener('click',()=>openForm('appointment'));$$('[data-open-form]').forEach(b=>b.addEventListener('click',()=>openForm(({vaccineForm:'vaccine',zoladexForm:'zoladex',psaForm:'psa',surgeryForm:'surgery',followForm:'follow',inventoryForm:'inventory'})[b.dataset.openForm])));
 
   $('#genericForm').addEventListener('submit',async e=>{if(e.submitter?.value==='cancel')return;e.preventDefault();if(!state.profile)return toast('Sin acceso autorizado');const fd=Object.fromEntries(new FormData(e.currentTarget));const cid=state.profile.clinic_id,uid=state.session.user.id;try{
@@ -526,20 +454,6 @@ footer{display:flex;justify-content:space-between;gap:12px;color:var(--muted);fo
       else if(currentKind==='surgery'){const {error}=await sb.from('surgeries').insert({clinic_id:cid,patient_id:fd.patient_id,procedure_name:fd.procedure_name,scheduled_at:fd.scheduled_at?new Date(fd.scheduled_at+'T12:00:00').toISOString():null,branch:fd.branch||null,hospital:fd.hospital||null,status:fd.status,preop_pending:fd.preop_pending||null,materials:fd.materials||null,price:fd.price?Number(fd.price):null,deposit:fd.deposit?Number(fd.deposit):null,notes:fd.notes||null,created_by:uid});if(error)throw error;}
       else if(currentKind==='follow'){const {error}=await sb.from('followups').insert({clinic_id:cid,patient_id:fd.patient_id,followup_type:fd.followup_type,due_date:fd.due_date||null,priority:fd.priority,status:'Pendiente',notes:fd.notes||null,created_by:uid});if(error)throw error;}
       else if(currentKind==='psa'){const total=Number(fd.psa_total),free=fd.psa_free?Number(fd.psa_free):null;if(!Number.isFinite(total)||total<0)throw new Error('Captura un PSA total válido.');if(free!==null&&(!Number.isFinite(free)||free<0))throw new Error('Captura un PSA libre válido.');const {error}=await sb.from('psa_tests').insert({clinic_id:cid,patient_id:fd.patient_id,test_date:fd.test_date,psa_total:total,psa_free:free,reference_threshold:4.0,laboratory:fd.laboratory||null,notes:fd.notes||null,created_by:uid});if(error)throw error;}
-      else if(currentKind==='lab'){
-        const labFields=['hemoglobin','hematocrit','platelets','leukocytes','glucose','urea','creatinine','uric_acid','total_cholesterol','triglycerides','hdl','ldl','vldl','hba1c','testosterone','ego','urine_culture','spermatobioscopy','notes'];
-        if(!labFields.some(k=>String(fd[k]??'').trim()!=='')) throw new Error('Captura al menos un resultado u observación del laboratorio.');
-        const numeric=['hemoglobin','hematocrit','platelets','leukocytes','glucose','urea','creatinine','uric_acid','total_cholesterol','triglycerides','hdl','ldl','vldl','hba1c','testosterone'];
-        const payload={patient_id:activePatientId,study_date:fd.study_date||todayKey(),ego:fd.ego||null,urine_culture:fd.urine_culture||null,spermatobioscopy:fd.spermatobioscopy||null,notes:fd.notes||null,created_by:uid};
-        numeric.forEach(k=>payload[k]=fd[k]!==''&&fd[k]!=null?Number(fd[k]):null);
-        const {error}=await sb.from('patient_labs').insert(payload);if(error)throw error;
-      }
-      else if(currentKind==='study'){
-        const {error}=await sb.from('patient_studies').insert({patient_id:activePatientId,study_date:fd.study_date||todayKey(),study_type:fd.study_type,title:fd.title||null,findings:fd.findings||null,impression:fd.impression||null,file_name:fd.file_name||null,notes:fd.notes||null,created_by:uid});if(error)throw error;
-      }
-      else if(currentKind==='clinicalNote'){
-        const {error}=await sb.from('patient_clinical_notes').insert({patient_id:activePatientId,reason:fd.reason||null,clinical_note:fd.clinical_note,diagnosis:fd.diagnosis||null,pending:fd.pending||null,follow_up:fd.follow_up||null,created_by:uid});if(error)throw error;
-      }
       else if(currentKind==='inventory'){
         let itemId=fd.item_id;
         if(itemId?.startsWith('__create__|')){
@@ -589,7 +503,7 @@ footer{display:flex;justify-content:space-between;gap:12px;color:var(--muted);fo
         const {error:mErr}=await sb.from('inventory_movements').insert({clinic_id:cid,item_id:item.id,movement_type:'Aplicación',quantity:-1,movement_date:fd.applied_at,lot:fd.lot||null,expires_on:fd.expires_on||null,patient_id:fd.patient_id,application_id:app.id,notes:`Salida Zoladex ${fd.presentation} · UROMED App`,created_by:uid});
         if(mErr){await sb.from('medication_applications').delete().eq('id',app.id);throw new Error('No se pudo descontar inventario; la aplicación de Zoladex fue revertida. '+mErr.message);}
       }
-      dialog.close();await loadData();renderAll();if(activePatientId)renderPatientRecord();toast(currentKind==='vaccine'?'Vacuna guardada e inventario actualizado':currentKind==='zoladex'?'Zoladex guardado e inventario actualizado':'Registro guardado');
+      dialog.close();await loadData();renderAll();toast(currentKind==='vaccine'?'Vacuna guardada e inventario actualizado':currentKind==='zoladex'?'Zoladex guardado e inventario actualizado':'Registro guardado');
     }catch(err){console.error(err);toast(err.message||'No se pudo guardar');}
   });
 
