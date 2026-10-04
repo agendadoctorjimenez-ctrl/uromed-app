@@ -148,6 +148,7 @@ footer{display:flex;justify-content:space-between;gap:12px;color:var(--muted);fo
           <button class="primary requires-auth" id="newAppointmentBtn">＋ Cita</button>
         </div>
         <div class="filters">
+          <input id="agendaDate" type="date" aria-label="Fecha de agenda">
           <select id="branchFilter"><option value="all">Todas las sucursales</option><option>La Piedad</option><option>Zamora</option></select>
           <select id="appointmentStatusFilter"><option value="all">Todos los estados</option><option>Agendada</option><option>Confirmada</option><option>Llegó</option><option>No llegó</option><option>Canceló</option><option>Reprogramada</option><option>Completada</option></select>
         </div>
@@ -237,14 +238,14 @@ footer{display:flex;justify-content:space-between;gap:12px;color:var(--muted);fo
 
     <dialog id="recordDialog">
       <form method="dialog" id="genericForm">
-        <div class="dialog-head"><div><span class="eyebrow" id="dialogEyebrow">REGISTRO</span><h2 id="dialogTitle">Nuevo registro</h2></div><button class="icon-btn" value="cancel">×</button></div>
+        <div class="dialog-head"><div><span class="eyebrow" id="dialogEyebrow">REGISTRO</span><h2 id="dialogTitle">Nuevo registro</h2></div><button class="icon-btn" type="button" id="genericCloseBtn">×</button></div>
         <div id="dialogFields" class="form-grid"></div>
         <div class="dialog-actions"><button class="ghost" type="button" id="genericCancelBtn">Cancelar</button><button class="primary" value="default">Guardar</button></div>
         <p class="form-help">Los datos se guardan en Supabase únicamente cuando existe una sesión autorizada.</p>
       </form>
     </dialog>
 
-    <footer><strong>UROMED App · v6</strong><span>Operación clínica activa · Supabase + RLS · Agenda, expedientes clínicos, laboratorios, estudios, notas, vacunas, Zoladex, PSA, cirugías, seguimientos e inventario.</span></footer>
+    <footer><strong>UROMED App · v6.3</strong><span>Operación clínica activa · Supabase + RLS · Agenda, expedientes clínicos, laboratorios, estudios, notas, vacunas, Zoladex, PSA, cirugías, seguimientos e inventario.</span></footer>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -340,11 +341,12 @@ footer{display:flex;justify-content:space-between;gap:12px;color:var(--muted);fo
 
   function renderAppointments(){
     const list=$('#appointmentList'); if(!state.profile){list.innerHTML='<div class="empty-state">Inicia sesión con un usuario autorizado para cargar la agenda.</div>';return;}
-    const branch=$('#branchFilter').value,status=$('#appointmentStatusFilter').value,pm=patientMap();
-    const items=state.appointments.filter(a=>(branch==='all'||a.branch===branch)&&(status==='all'||a.status===status)).sort((a,b)=>new Date(a.starts_at)-new Date(b.starts_at));
-    const calendarName=a=>{const p=pm.get(a.patient_id);if(p?.full_name)return p.full_name;const notes=String(a.notes||'');const m=notes.match(/\[GCAL\]\s*(?:[^|\n]*\|\s*)?([^|\n]+)/i);return (m?.[1]||'').trim()||'Sin paciente';};
-    list.innerHTML=items.length?'':'<div class="empty-state"><strong>Sin citas</strong><p>Cuando registremos o sincronicemos Google Calendar aparecerán aquí.</p></div>';
-    items.forEach(a=>{const row=document.createElement('div');row.className='list-item';row.innerHTML=`<span class="status ${statusColor(a.status)}">${esc(a.status).toUpperCase()}</span><div><strong>${fmtTime(a.starts_at)} · ${esc(calendarName(a))}</strong><small>${esc(a.branch)} · ${esc(a.appointment_type)} · ${new Date(a.starts_at).toLocaleDateString('es-MX')}</small></div><div class="item-actions"><button class="mini" data-s="Confirmada">Confirmar</button><button class="mini" data-s="Llegó">Llegó</button><button class="mini" data-s="No llegó">No llegó</button></div>`;
+    const branch=$('#branchFilter').value,status=$('#appointmentStatusFilter').value,pm=patientMap(),selected=$('#agendaDate')?.value||todayKey();
+    const localKey=v=>{const d=new Date(v);return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;};
+    const items=state.appointments.filter(a=>localKey(a.starts_at)===selected&&(branch==='all'||a.branch===branch)&&(status==='all'||a.status===status)).sort((a,b)=>new Date(a.starts_at)-new Date(b.starts_at));
+    const calendarName=a=>{const p=pm.get(a.patient_id);if(p?.full_name)return p.full_name;const notes=String(a.notes||'');const m=notes.match(/\[GCAL\]\s*(?:[^|\n]*\|\s*)?([^|\n]+)/i);return (m?.[1]||'').trim()||(a.patient_id?'Paciente no encontrado':'Sin paciente vinculado');};
+    list.innerHTML=items.length?'':`<div class="empty-state"><strong>Sin citas para ${new Date(selected+'T12:00:00').toLocaleDateString('es-MX')}</strong><p>Selecciona otra fecha o registra una nueva cita.</p></div>`;
+    items.forEach(a=>{const row=document.createElement('div');row.className='list-item';row.innerHTML=`<span class="status ${statusColor(a.status)}">${esc(a.status).toUpperCase()}</span><div><strong>${fmtTime(a.starts_at)} · ${esc(calendarName(a))}</strong><small>${esc(a.branch)} · ${esc(a.appointment_type)}</small></div><div class="item-actions"><button class="mini" data-s="Confirmada">Confirmar</button><button class="mini" data-s="Llegó">Llegó</button><button class="mini" data-s="No llegó">No llegó</button></div>`;
       row.querySelectorAll('[data-s]').forEach(btn=>btn.addEventListener('click',async()=>{const {error}=await sb.from('appointments').update({status:btn.dataset.s,updated_at:new Date().toISOString()}).eq('id',a.id);if(error)return toast(error.message);a.status=btn.dataset.s;renderAppointments();updateKpis();}));list.appendChild(row);});
   }
 
@@ -444,8 +446,8 @@ footer{display:flex;justify-content:space-between;gap:12px;color:var(--muted);fo
   function renderAll(){updateKpis();renderAppointments();renderPatients();renderVaccines();renderZoladex();renderPsa();renderSurgeries();renderFollowups();renderInventory();}
 
   const dialog=$('#recordDialog'), fields=$('#dialogFields'), title=$('#dialogTitle'), eyebrow=$('#dialogEyebrow'); let currentKind=null;
-  $('#genericCancelBtn').addEventListener('click',()=>dialog.close());
-  $('#genericCloseBtn').addEventListener('click',()=>dialog.close());
+  $('#genericCancelBtn')?.addEventListener('click',()=>dialog.close());
+  $('#genericCloseBtn')?.addEventListener('click',()=>dialog.close());
   const definitions={
     patient:{title:'Nuevo paciente',eyebrow:'EXPEDIENTE',fields:[['full_name','Nombre completo','text'],['phone','Teléfono','tel'],['birth_date','Fecha de nacimiento','date'],['sex','Sexo','select',['Sin capturar','Masculino','Femenino','Otro']],['allergies','Alergias','text'],['clinical_alerts','Alertas clínicas','textarea'],['notes','Notas','textarea']]},
     appointment:{title:'Nueva cita',eyebrow:'AGENDA',fields:[['patient_id','Paciente','patient'],['branch','Sucursal','select',['La Piedad','Zamora']],['date','Fecha','date'],['time','Hora','time'],['appointment_type','Tipo','select',['Consulta','Revisión','Vacuna','Zoladex','Posoperatorio','Otro']],['notes','Notas','textarea']]},
@@ -515,6 +517,7 @@ footer{display:flex;justify-content:space-between;gap:12px;color:var(--muted);fo
   $('#addLabBtn').addEventListener('click',()=>openForm('lab'));
   $('#addStudyBtn').addEventListener('click',()=>openForm('study'));
   $('#addClinicalNoteBtn').addEventListener('click',()=>openForm('clinicalNote'));
+  const agendaDate=$('#agendaDate');if(agendaDate){agendaDate.value=todayKey();agendaDate.addEventListener('change',renderAppointments);}
   $('#newPatientBtn').addEventListener('click',()=>openForm('patient'));$('#newAppointmentBtn').addEventListener('click',()=>openForm('appointment'));$$('[data-open-form]').forEach(b=>b.addEventListener('click',()=>openForm(({vaccineForm:'vaccine',zoladexForm:'zoladex',psaForm:'psa',surgeryForm:'surgery',followForm:'follow',inventoryForm:'inventory'})[b.dataset.openForm])));
 
   $('#genericForm').addEventListener('submit',async e=>{if(e.submitter?.value==='cancel')return;e.preventDefault();if(!state.profile)return toast('Sin acceso autorizado');const fd=Object.fromEntries(new FormData(e.currentTarget));const cid=state.profile.clinic_id,uid=state.session.user.id;try{
