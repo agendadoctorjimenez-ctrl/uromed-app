@@ -50,6 +50,7 @@ No debe ejecutarse contra citas reales hasta rediseñar y probar el flujo con un
 - Lectura de metadatos del repositorio, comparación de archivos disponibles y lectura de esquemas/políticas: completadas.
 - Conteos de citas, pacientes, respaldos y conciliación: completados.
 - Linter de seguridad y rendimiento de Supabase: consultado.
+- Sintaxis JavaScript de los dos HTML incluidos en el ZIP: validada localmente con `node --check`; el PNG del logo se verificó como archivo PNG válido de 854 × 267 px.
 - Build, pruebas de navegador, pruebas integrales con Calendar, OAuth real, subida de foto, firma, restauración y pruebas de permisos multiusuario: pendientes; no se declaran como aprobadas.
 
 ## Próximos pasos para continuar
