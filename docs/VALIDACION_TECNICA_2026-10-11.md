@@ -19,7 +19,7 @@
 - Los respaldos y la conciliación se mantienen en sus ubicaciones actuales.
 
 ## Diferencias entre repositorio y ZIP
-- La rama principal contiene `index.html` y `index-v6.html`, módulos operativos de agenda, pacientes, vacunas, Zoladex, PSA, cirugías, seguimiento e inventario.
+- La rama principal contiene `index.html` y `index-v6.html`, módulos de agenda, pacientes, vacunas, Zoladex, PSA, cirugías, seguimiento e inventario.
 - La rama principal no contiene `logo-uromed.png`, aunque `index.html` ya lo referencia.
 - La rama principal no implementa un expediente completo con firma validada, foto privada ni sincronización bidireccional de Calendar.
 - El ZIP contiene un frontend ampliado y el PNG oficial, pero no debe sobrescribir el código remoto sin reconciliar las diferencias.
@@ -37,14 +37,14 @@ No debe ejecutarse contra citas reales hasta rediseñar y probar el flujo con un
 
 ## Seguridad observada
 - RLS está activado en las tablas operativas inspeccionadas; varias tienen políticas limitadas por clínica/perfil.
-- Los asesores de Supabase señalan que las tablas de respaldo y la tabla privada de conciliación tienen RLS sin políticas (esperable para bloquear acceso de usuarios normales, pero debe comprobarse también la ausencia de grants y el acceso de propietario/administración).
+- Los asesores de Supabase señalan que las tablas de respaldo y la tabla privada de conciliación tienen RLS sin políticas. Esto bloquea el acceso de usuarios normales por RLS; se debe confirmar además la ausencia de grants y el acceso de propietario/administración.
 - Supabase Auth tiene deshabilitada la protección contra contraseñas filtradas.
 - El linter reporta claves foráneas sin índices; no se aplicaron cambios de rendimiento.
 - Vercel devuelve 403 para lecturas de configuración/despliegues bajo el equipo conectado. No se intentó cambiar de equipo ni se desplegó.
 - No se validó un proceso de restauración de respaldos.
 
 ## Archivo SQL en esta rama
-`supabase/migrations/20261011_uromed_clinical_calendar_draft.sql` es un borrador de revisión, no aplicado. Prepara tablas privadas de integración, notas clínicas de solo inserción y un bucket privado para fotos. Requiere revisión de esquema/políticas, pruebas aisladas y autorización antes de cualquier aplicación. La fecha de creación de una nota y la sesión del usuario no equivalen por sí solas a una firma electrónica jurídicamente validada.
+`supabase/migrations/20261011_uromed_clinical_calendar_draft.sql` es un borrador de revisión, no aplicado. Añade tablas privadas de integración, una tabla de notas clínicas de solo inserción y un bucket privado para fotos. Requiere revisión de esquema/políticas, pruebas aisladas y autorización antes de cualquier aplicación. La fecha de creación de una nota y la sesión del usuario no equivalen por sí solas a una firma electrónica jurídicamente validada.
 
 ## Pruebas ejecutadas
 - Lectura de metadatos del repositorio, comparación de archivos disponibles y lectura de esquemas/políticas: completadas.
