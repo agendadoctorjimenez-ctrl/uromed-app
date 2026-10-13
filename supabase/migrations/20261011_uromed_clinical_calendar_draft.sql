@@ -96,7 +96,7 @@ revoke all on all tables in schema integration_private from public, anon, authen
 
 -- Append-only clinical encounter notes. Database timestamp/author are audit evidence,
 -- NOT a legally validated advanced electronic signature.
-create table if not exists public.clinical_notes (
+create table if not exists public.uromed_clinical_encounters (
   id uuid primary key default gen_random_uuid(),
   clinic_id uuid not null references public.clinics(id) on delete restrict,
   patient_id uuid not null references public.patients(id) on delete restrict,
@@ -114,23 +114,23 @@ create table if not exists public.clinical_notes (
   signature_method text check (signature_method in ('session_attestation','qualified_electronic_signature')),
   signature_validation_status text not null default 'pending_legal_validation'
     check (signature_validation_status in ('pending_legal_validation','validated','rejected')),
-  supersedes_note_id uuid references public.clinical_notes(id) on delete restrict,
+  supersedes_note_id uuid references public.uromed_clinical_encounters(id) on delete restrict,
   correction_reason text,
   document_sha256 text
 );
-create index if not exists clinical_notes_patient_encounter_idx on public.clinical_notes(patient_id, encounter_at desc);
-create index if not exists clinical_notes_clinic_idx on public.clinical_notes(clinic_id, created_at desc);
-alter table public.clinical_notes enable row level security;
-revoke all on public.clinical_notes from public, anon, authenticated;
-grant select, insert on public.clinical_notes to authenticated;
+create index if not exists uromed_clinical_encounters_patient_encounter_idx on public.uromed_clinical_encounters(patient_id, encounter_at desc);
+create index if not exists uromed_clinical_encounters_clinic_idx on public.uromed_clinical_encounters(clinic_id, created_at desc);
+alter table public.uromed_clinical_encounters enable row level security;
+revoke all on public.uromed_clinical_encounters from public, anon, authenticated;
+grant select, insert on public.uromed_clinical_encounters to authenticated;
 
-drop policy if exists clinical_notes_read_same_clinic on public.clinical_notes;
-create policy clinical_notes_read_same_clinic on public.clinical_notes for select to authenticated
+drop policy if exists uromed_encounters_read_same_clinic on public.uromed_clinical_encounters;
+create policy uromed_encounters_read_same_clinic on public.uromed_clinical_encounters for select to authenticated
 using (exists (
   select 1 from public.profiles p
   where p.user_id = (select auth.uid()) and p.clinic_id = clinical_notes.clinic_id and p.active = true
 ));
-create policy clinical_notes_insert_doctor on public.clinical_notes for insert to authenticated
+create policy uromed_encounters_insert_doctor on public.uromed_clinical_encounters for insert to authenticated
 with check (
   author_user_id = (select auth.uid())
   and exists (
