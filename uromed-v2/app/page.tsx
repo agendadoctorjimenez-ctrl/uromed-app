@@ -6,7 +6,6 @@ export default async function Page() {
     biography: "Atención urológica en La Piedad y Zamora.",
     services:
       "Consulta de urología;Próstata;Litiasis;Cirugía urológica;Salud sexual;Vacunación VPH",
-    rfc: null as string | null,
     beneficiary: null as string | null,
     bank: null as string | null,
     clabe: null as string | null,
@@ -16,7 +15,7 @@ export default async function Page() {
       id: "LP",
       name: "La Piedad",
       phone: "3521327669",
-      address: "Enrique Ramírez #57-A, frente al Hospital del Carmen",
+      address: "",
       hours: "",
       maps_url: "",
     },
@@ -24,7 +23,7 @@ export default async function Page() {
       id: "ZAM",
       name: "Zamora",
       phone: "3511502304",
-      address: "Aquiles Serdán Sur #93, esquina con Colón",
+      address: "",
       hours: "",
       maps_url: "",
     },
@@ -49,7 +48,7 @@ export default async function Page() {
       <section className="hero">
         <img
           className="logo"
-          src="/logo-uromed.png"
+          src="/logo-uromed-transparent.png"
           alt="UROMED — La Urología a tu Alcance"
         />
         <span className="eyebrow">Dr. Israel Jiménez Heredia</span>
@@ -133,12 +132,6 @@ export default async function Page() {
             <b>{card.clabe}</b>
           </p>
           <Copy value={card.clabe} />
-        </section>
-      )}
-      {card.rfc && (
-        <section className="card section-gap">
-          <h2>RFC</h2>
-          <p><b>{card.rfc}</b></p>
         </section>
       )}
       <footer>

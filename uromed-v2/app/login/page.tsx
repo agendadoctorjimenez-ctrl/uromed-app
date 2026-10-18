@@ -5,7 +5,7 @@ export default function Page() {
   return (
     <div className="login">
       <a href="/">
-        <img className="logo" src="/logo-uromed.png" alt="UROMED" />
+        <img className="logo" src="/logo-uromed-transparent.png" alt="UROMED" />
       </a>
       <div className="card">
         <span className="eyebrow">Sistema privado</span>

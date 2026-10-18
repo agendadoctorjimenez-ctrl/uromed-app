@@ -1,10 +1,10 @@
 @import "tailwindcss";
 :root {
-  --red: #17324d;
-  --ink: #252c33;
-  --muted: #68737d;
-  --line: #dfe4e8;
-  --paper: #f3f5f6;
+  --navy: #183451;
+  --ink: #243244;
+  --muted: #687789;
+  --line: #d9e0e8;
+  --paper: #f2f4f7;
 }
 * {
   box-sizing: border-box;
@@ -30,7 +30,7 @@ button:disabled {
 }
 button,
 .btn {
-  background: var(--red);
+  background: var(--navy);
   color: white;
   border: 0;
   border-radius: 10px;
@@ -133,12 +133,12 @@ label {
   display: inline-block;
 }
 .red {
-  color: var(--red);
+  color: var(--navy);
 }
 .error {
   padding: 14px;
-  background: #eaf0f5;
-  color: #17324d;
+  background: #fff0f0;
+  color: #9b1420;
   border-radius: 10px;
   margin: 12px 0;
 }
@@ -163,7 +163,7 @@ label {
   font-size: 12px;
   letter-spacing: 2px;
   text-transform: uppercase;
-  color: var(--red);
+  color: var(--navy);
   font-weight: 700;
 }
 .hero {
@@ -183,7 +183,7 @@ label {
   min-height: 100vh;
 }
 .sidebar {
-  background: white;
+  background: #e8edf2;
   border-right: 1px solid var(--line);
   padding: 26px 16px;
   position: sticky;
@@ -203,8 +203,8 @@ label {
 }
 .sidebar nav a:hover,
 .sidebar nav a.active {
-  background: #eaf0f5;
-  color: var(--red);
+  background: #dce5ee;
+  color: var(--navy);
 }
 main.private {
   padding: 32px;
@@ -237,7 +237,7 @@ td {
   overflow-wrap: anywhere;
 }
 td a {
-  color: var(--red);
+  color: var(--navy);
   font-weight: 600;
 }
 summary {
@@ -277,8 +277,8 @@ summary {
   display: block;
   padding: 6px;
   margin: 6px 0;
-  background: #eaf0f5;
-  border-left: 3px solid #17324d;
+  background: #e9eff5;
+  border-left: 3px solid var(--navy);
   border-radius: 4px;
   font-size: 11px;
   overflow-wrap: anywhere;
@@ -332,7 +332,7 @@ textarea:focus,
 select:focus,
 button:focus-visible,
 a:focus-visible {
-  outline: 2px solid var(--red);
+  outline: 2px solid var(--navy);
   outline-offset: 2px;
 }
 .record-details {

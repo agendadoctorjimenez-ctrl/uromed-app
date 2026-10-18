@@ -16,7 +16,7 @@ export default async function Layout({
     <div className="shell">
       <aside className="sidebar">
         <a href="/">
-          <img className="logo" src="/logo-uromed.png" alt="UROMED" />
+          <img className="logo" src="/logo-uromed-transparent.png" alt="UROMED" />
         </a>
         <Nav doctor={profile.role === "medico"} />
         <div className="identity">

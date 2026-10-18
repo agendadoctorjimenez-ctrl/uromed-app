@@ -47,12 +47,12 @@ export function TrendChart({
         <polyline
           points={ordered.map((v, i) => `${x(i)},${y(v.value)}`).join(" ")}
           fill="none"
-          stroke="#17324d"
+          stroke="#183451"
           strokeWidth="2"
         />
         {ordered.map((v, i) => (
           <g key={i}>
-            <circle cx={x(i)} cy={y(v.value)} r="4" fill="#17324d">
+            <circle cx={x(i)} cy={y(v.value)} r="4" fill="#183451">
               <title>
                 {v.date}: {v.value} {units}
               </title>
