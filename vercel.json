@@ -1,0 +1,4 @@
+{
+  "crons": [{ "path": "/api/calendar/sync", "schedule": "*/5 * * * *" }],
+  "functions": { "app/api/calendar/sync/route.ts": { "maxDuration": 180 } }
+}
