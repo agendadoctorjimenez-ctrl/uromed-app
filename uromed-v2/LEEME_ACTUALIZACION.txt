@@ -1,0 +1,16 @@
+UROMED V2 — ACTUALIZACIÓN DE ESTILO Y DATOS PÚBLICOS
+
+Contenido: carpetas app, components, public; y sql/03-public-rfc.sql.
+
+PASO A: Actualizar el código en el repositorio del doctor.
+En GitHub, dentro de la carpeta raíz del proyecto (uromed-v2/uromed-v2), selecciona Add file → Upload files y carga las carpetas app, components, public y sql de este ZIP. Revisa que las rutas comiencen con /app, /components, /public y /sql antes de guardar.
+
+PASO B: Actualizar Supabase del doctor.
+Abre sql/03-public-rfc.sql y ejecútalo una sola vez en SQL Editor del proyecto UROMED V2. No vuelvas a ejecutar sql/01-schema.sql sobre una base ya creada.
+
+PASO C: Capturar los datos reales.
+Cuando la actualización esté publicada, el médico administrador entra a Sistema → Configuración y captura beneficiario, banco, CLABE de 18 dígitos y RFC. Puede activar cada casilla de autorización por separado. Por defecto, transferencia y RFC no se muestran al público. La entrega no contiene datos bancarios ni RFC reales.
+
+La tarjeta ya trae las direcciones oficiales: La Piedad, Enrique Ramírez #57-A frente al Hospital del Carmen; Zamora, Aquiles Serdán Sur #93 esquina con Colón. Horarios y enlaces de Google Maps siguen editables desde Configuración.
+
+Esta actualización no emite CFDI ni se conecta al SAT.

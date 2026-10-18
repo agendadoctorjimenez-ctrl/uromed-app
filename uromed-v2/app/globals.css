@@ -1,0 +1,409 @@
+@import "tailwindcss";
+:root {
+  --red: #17324d;
+  --ink: #252c33;
+  --muted: #68737d;
+  --line: #dfe4e8;
+  --paper: #f3f5f6;
+}
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+  color: var(--ink);
+  background: var(--paper);
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 15px;
+}
+a {
+  color: inherit;
+  text-decoration: none;
+}
+button,
+a.btn {
+  cursor: pointer;
+}
+button:disabled {
+  opacity: 0.5;
+  cursor: wait;
+}
+button,
+.btn {
+  background: var(--red);
+  color: white;
+  border: 0;
+  border-radius: 10px;
+  padding: 12px 18px;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.secondary {
+  background: white !important;
+  color: var(--ink) !important;
+  border: 1px solid var(--line) !important;
+}
+.quiet {
+  color: var(--muted);
+}
+h1 {
+  font-size: clamp(28px, 4vw, 44px);
+  line-height: 1.15;
+  letter-spacing: -1px;
+  margin: 10px 0 16px;
+}
+h2 {
+  font-size: 22px;
+  font-weight: 700;
+  margin: 0 0 16px;
+}
+h3 {
+  font-size: 17px;
+  font-weight: 700;
+  margin: 0 0 10px;
+}
+p {
+  line-height: 1.7;
+}
+input,
+select,
+textarea {
+  font: inherit;
+  width: 100%;
+  padding: 11px;
+  border: 1px solid #d2d2d2;
+  border-radius: 8px;
+  background: white;
+  color: #222;
+}
+input[type="checkbox"] {
+  width: 20px;
+  height: 20px;
+  vertical-align: middle;
+}
+textarea {
+  min-height: 90px;
+  resize: vertical;
+}
+label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+.field {
+  margin-bottom: 16px;
+}
+.card {
+  background: white;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 24px;
+}
+.grid {
+  display: grid;
+  gap: 20px;
+}
+.two {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.three {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+.stack {
+  display: grid;
+  gap: 18px;
+}
+.row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.between {
+  justify-content: space-between;
+}
+.badge {
+  font-size: 12px;
+  padding: 5px 9px;
+  border-radius: 6px;
+  background: #f1f1f1;
+  display: inline-block;
+}
+.red {
+  color: var(--red);
+}
+.error {
+  padding: 14px;
+  background: #eaf0f5;
+  color: #17324d;
+  border-radius: 10px;
+  margin: 12px 0;
+}
+.success {
+  padding: 14px;
+  background: #f0faf2;
+  color: #256734;
+  border-radius: 10px;
+  margin: 12px 0;
+}
+.logo {
+  width: 180px;
+  height: auto;
+  display: block;
+}
+.public {
+  max-width: 1100px;
+  margin: auto;
+  padding: 30px 24px;
+}
+.eyebrow {
+  font-size: 12px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--red);
+  font-weight: 700;
+}
+.hero {
+  padding: 70px 0 50px;
+}
+.hero p {
+  max-width: 600px;
+  font-size: 18px;
+}
+.hero .logo {
+  width: min(420px, 80%);
+  margin-bottom: 30px;
+}
+.shell {
+  display: grid;
+  grid-template-columns: 240px minmax(0, 1fr);
+  min-height: 100vh;
+}
+.sidebar {
+  background: white;
+  border-right: 1px solid var(--line);
+  padding: 26px 16px;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow: auto;
+}
+.sidebar nav {
+  display: grid;
+  gap: 5px;
+  margin: 30px 0;
+}
+.sidebar nav a {
+  padding: 11px 14px;
+  border-radius: 8px;
+  font-size: 14px;
+}
+.sidebar nav a:hover,
+.sidebar nav a.active {
+  background: #eaf0f5;
+  color: var(--red);
+}
+main.private {
+  padding: 32px;
+  max-width: 1500px;
+  width: 100%;
+}
+.private header {
+  margin-bottom: 24px;
+}
+.table-wrap {
+  overflow-x: auto;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+th {
+  text-align: left;
+  color: #777;
+  font-weight: 600;
+  border-bottom: 1px solid var(--line);
+  padding: 12px 10px;
+  white-space: nowrap;
+}
+td {
+  padding: 14px 10px;
+  border-bottom: 1px solid var(--line);
+  max-width: 250px;
+  overflow-wrap: anywhere;
+}
+td a {
+  color: var(--red);
+  font-weight: 600;
+}
+summary {
+  cursor: pointer;
+  font-weight: 600;
+  padding: 8px 0;
+}
+.toolbar {
+  margin: 20px 0;
+}
+.metric {
+  font-size: 34px;
+  font-weight: 700;
+}
+.metric-label {
+  color: #777;
+  font-size: 13px;
+}
+.calendar {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 1px;
+  background: var(--line);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  overflow: hidden;
+}
+.day {
+  min-height: 135px;
+  background: white;
+  padding: 8px;
+}
+.day b {
+  font-size: 12px;
+}
+.event {
+  display: block;
+  padding: 6px;
+  margin: 6px 0;
+  background: #eaf0f5;
+  border-left: 3px solid #17324d;
+  border-radius: 4px;
+  font-size: 11px;
+  overflow-wrap: anywhere;
+}
+.schedule {
+  display: grid;
+  grid-template-columns: 65px minmax(0, 1fr);
+  gap: 0;
+}
+.schedule > div {
+  border-bottom: 1px solid var(--line);
+  padding: 12px;
+}
+.schedule time {
+  color: #777;
+  font-size: 12px;
+  padding: 14px 0;
+}
+.graph {
+  width: 100%;
+  height: 170px;
+}
+.empty {
+  padding: 25px;
+  color: #777;
+  text-align: center;
+}
+.small {
+  font-size: 12px;
+}
+footer {
+  padding: 30px 0;
+  color: #777;
+  font-size: 12px;
+}
+.login {
+  max-width: 430px;
+  margin: 10vh auto;
+  padding: 24px;
+}
+.login .logo {
+  margin-bottom: 32px;
+}
+fieldset {
+  border: 0;
+  padding: 0;
+  margin: 0;
+}
+input:focus,
+textarea:focus,
+select:focus,
+button:focus-visible,
+a:focus-visible {
+  outline: 2px solid var(--red);
+  outline-offset: 2px;
+}
+.record-details {
+  border-top: 1px solid var(--line);
+  padding-top: 18px;
+}
+.record-details dt {
+  font-size: 12px;
+  color: #777;
+}
+.record-details dd {
+  margin: 3px 0 15px;
+  white-space: pre-wrap;
+}
+.section-gap {
+  margin-top: 28px;
+}
+@media (max-width: 900px) {
+  .three {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .shell {
+    grid-template-columns: 1fr;
+  }
+  .sidebar {
+    position: relative;
+    height: auto;
+    border-right: 0;
+    padding: 14px 20px;
+  }
+  .sidebar .logo {
+    width: 140px;
+  }
+  .sidebar nav {
+    display: flex;
+    overflow: auto;
+    margin: 14px 0 0;
+    gap: 6px;
+    white-space: nowrap;
+  }
+  .sidebar .identity {
+    display: none;
+  }
+  main.private {
+    padding: 20px;
+  }
+  .two {
+    grid-template-columns: 1fr;
+  }
+  .calendar {
+    min-width: 650px;
+  }
+  .hero {
+    padding: 35px 0;
+  }
+  .day {
+    min-height: 120px;
+  }
+}
+@media (max-width: 500px) {
+  .three {
+    grid-template-columns: 1fr;
+  }
+  .card {
+    padding: 18px;
+  }
+  .public {
+    padding: 22px 18px;
+  }
+  button,
+  .btn {
+    padding: 10px 12px;
+  }
+}
